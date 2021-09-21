@@ -43,11 +43,23 @@ class Functor:
 			return False, {self.y: self.y + 1 - (-1)**self.x}
 		elif m == [[0, 0, 0, 0], [1, 1, 1, 1], [1, 1, 1, 1], [0, 0, 0, 0]]:
 			return True, {self.y: 2*self.y + (1 - (-1)**self.y)/2}
+		elif m == [[1, 1, 0, 0], [1, 1, 0, 0], [0, 0, 1, 1],[0, 0, 1, 1]]:
+			return False, {self.x: self.x + self.y}
+		elif m == [[1, 1, 0, 0], [1, 0, 0, 1], [1, 1, 0, 0], [1, 0, 0, 1]]:
+			return False, {self.x: self.x - (1 - (-1)**self.y) / 2}
+		elif m == [[1, 1, 0, 0], [1, 1, 0, 0], [1, 1, 0, 0], [1, 1, 0, 0]]:
+			return True, {self.x: 2*self.x - (1 - (-1)**self.x)/2 + 2}
 		else:
 			raise "Invalid pattern"
 
 	def smooth(self) -> Add:
 		return (self.f
+				.subs((-1)**(2*self.y + (1 - (-1)**self.y)/2), (-1)**self.y)
+				.subs((-1)**(2*self.x + (1 - (-1)**self.x)/2), (-1)**self.x)
+				.subs((-1)**(2*self.y - (1 - (-1)**self.y)/2 + 2), (-1)**self.x)
+				.subs((-1)**(2*self.x - (1 - (-1)**self.x)/2 + 2), (-1)**self.x)
+				.subs((-1)**(self.x - (1 - (-1)**self.y) / 2), (-1)**(self.x + self.y))
+				.subs((-1)**(self.y - (1 - (-1)**self.x) / 2), (-1)**(self.x + self.y))
 				.expand()
 				.subs((-1)**(2*self.y), 1)
 				.subs((-1)**(2*self.x), 1)
@@ -68,7 +80,7 @@ class Functor:
 
 		return f
 
-	def finalize(self):
+	def print(self):
 		sep_print()
 		sympy.pprint(self.f)
 		matrix_print(self.gen_matrix())

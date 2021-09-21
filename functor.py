@@ -41,6 +41,8 @@ class Functor:
 			return True, {self.x: 2*self.x + 1}
 		elif m == [[0, 1, 0, 1], [1, 0, 1, 0], [1, 0, 1, 0], [0, 1, 0, 1]]:
 			return False, {self.y: self.y + 1 - (-1)**self.x}
+		elif m == [[0, 0, 0, 0], [1, 1, 1, 1], [1, 1, 1, 1], [0, 0, 0, 0]]:
+			return True, {self.y: 2*self.y + (1 - (-1)**self.y)/2}
 		else:
 			raise "Invalid pattern"
 
@@ -69,7 +71,6 @@ class Functor:
 	def finalize(self):
 		sep_print()
 		sympy.pprint(self.f)
-		m = self.gen_matrix()
-		matrix_print(m)
+		matrix_print(self.gen_matrix())
 		sympy.print_maple_code(self.f)
 		sep_print()

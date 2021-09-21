@@ -49,6 +49,8 @@ class Functor:
 			return False, {self.x: self.x - (1 - (-1)**self.y) / 2}
 		elif m == [[1, 1, 0, 0], [1, 1, 0, 0], [1, 1, 0, 0], [1, 1, 0, 0]]:
 			return True, {self.x: 2*self.x - (1 - (-1)**self.x)/2 + 2}
+		elif m == [[1, 1, 0, 0], [0, 0, 1, 1], [1, 1, 0, 0], [0, 0, 1, 1]]:
+			return False, {self.x: self.x + 1 - (-1)**(self.y + 1)}
 		else:
 			raise "Invalid pattern"
 
@@ -66,7 +68,7 @@ class Functor:
 				.subs((-1)**((-1)**self.x), -1)
 				.subs((-1)**((-1)**self.y), -1))
 
-	def lift(self) -> Add:
+	def lift(self) -> Tuple[Add, bool]:
 		sep_print()
 		sympy.pprint(self.f)
 		m = self.gen_matrix()
@@ -78,11 +80,12 @@ class Functor:
 		if do_division is True:
 			f /= 2
 
-		return f
+		return f, do_division
 
 	def print(self):
 		sep_print()
 		sympy.pprint(self.f)
 		matrix_print(self.gen_matrix())
 		sympy.print_maple_code(self.f)
+
 		sep_print()

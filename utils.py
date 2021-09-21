@@ -1,4 +1,4 @@
-from sympy.core.numbers import Integer
+from sympy import Integer
 
 
 def sep_print():

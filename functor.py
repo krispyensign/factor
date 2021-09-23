@@ -37,6 +37,7 @@ class Functor:
     def lift(self, rotate_x: bool) -> Tuple[Add, bool, bool]:
         do_division, sub_expression, is_rotated = self.matcher(
             self.gen_matrix(), rotate_x=rotate_x)
+        pprint(sub_expression)
 
         f = Functor(self.f.subs(sub_expression)).smooth()
         if do_division is True:
@@ -58,7 +59,7 @@ class Functor:
 
                 # 1, 2, 5, 6, ... => -1 1 -1 1
                 .subs((-1)**(2*self.x - (1 - (-1)**self.x)/2 + 1), (-1)**(self.x + 1))
-                .subs((-1)**(2*self.y - (1 - (-1)**self.x)/2 + 1), (-1)**(self.y + 1))
+                .subs((-1)**(2*self.y - (1 - (-1)**self.y)/2 + 1), (-1)**(self.y + 1))
 
                 # 2, 3, 6, 7, ... => 1 -1 1 -1
                 .subs((-1)**(2*self.y - (1 - (-1)**self.y)/2 + 2), (-1)**self.y)
@@ -66,6 +67,8 @@ class Functor:
 
                 .subs((-1)**(self.x - (1 - (-1)**self.y) / 2), (-1)**(self.x + self.y))
                 .subs((-1)**(self.y - (1 - (-1)**self.x) / 2), (-1)**(self.x + self.y))
+                .subs((-1)**(self.x + (1 - (-1)**self.y) / 2), (-1)**(self.x + self.y))
+                .subs((-1)**(self.y + (1 - (-1)**self.x) / 2), (-1)**(self.x + self.y))
 
                 .expand()
 
@@ -108,6 +111,9 @@ class Functor:
 
         elif m == [[1, 1, 1, 1], [1, 0, 1, 0], [0, 0, 0, 0], [0, 1, 0, 1]]:
             return False, {self.y: self.y - (1 - (-1)**self.x) / 2}, False
+        
+        elif m == [[0, 1, 1, 0], [0, 0, 1, 1], [0, 1, 1, 0], [0, 0, 1, 1]]:
+            return False, {self.x: self.x + (1 - (-1)**self.y) / 2}, False
 
         elif m == [[1, 1, 0, 0], [0, 0, 1, 1], [1, 1, 0, 0], [0, 0, 1, 1]]:
             return False, {self.x: self.x + 1 - (-1)**(self.y + 1)}, False

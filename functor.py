@@ -76,7 +76,11 @@ class Functor:
                 .subs((-1)**((-1)**self.x), -1)
                 .subs((-1)**((-1)**self.y), -1))
 
-    def matcher(self, m: list[list[Integer]], rotate_x: bool) -> Tuple[bool, dict[Symbol, Add], bool]:
+    def matcher(
+        self,
+        m: list[list[Integer]],
+        rotate_x: bool
+    ) -> Tuple[bool, dict[Symbol, Add], bool]:
         rotator: dict[Symbol, Add]
         if rotate_x is True:
             rotator = {self.x: self.x + self.y}
@@ -117,6 +121,8 @@ class Functor:
             return False, {self.y: self.y + 1 - (-1)**self.x}, False
         elif m == [[0, 1, 0, 1], [1, 0, 1, 0], [1, 0, 1, 0], [0, 1, 0, 1]]:
             return False, {self.y: self.y + 1 - (-1)**self.x}, False
+        elif m == [[1, 0, 1, 0], [0, 1, 0, 1], [0, 1, 0, 1], [1, 0, 1, 0]]:
+            return False, {self.y: self.y + 1 - (-1)**self.x}, False
 
         elif m == [[0, 0, 0, 0], [1, 1, 1, 1], [1, 1, 1, 1], [0, 0, 0, 0]]:
             return True, {self.y: 2*self.y + (1 - (-1)**self.y) / 2}, False
@@ -129,6 +135,9 @@ class Functor:
 
         elif m == [[1, 0, 0, 1], [1, 0, 0, 1], [1, 0, 0, 1], [1, 0, 0, 1]]:
             return True, {self.x: 2*self.x - (1 - (-1)**self.x) / 2 + 1}, False
+        
+        elif m == [[1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0], [1, 1, 1, 1]]:
+            return True, {self.y: 2*self.y - (1 - (-1)**self.y) / 2 + 1}, False
 
         elif m == [[1, 1, 0, 0], [1, 1, 0, 0], [1, 1, 0, 0], [1, 1, 0, 0]]:
             return True, {self.x: 2*self.x - (1 - (-1)**self.x) / 2 + 2}, False

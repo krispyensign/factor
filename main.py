@@ -2,9 +2,12 @@ from functor import Functor
 from utils import matrix_print
 
 if __name__ == "__main__":
+    # initialize everything
     fn = Functor(43*107)
     bits = 0
     rotate_x = False
+
+    # loop through the constructions
     for i in range(15):
         # print some stats
         print("Iteration: " + str(i))

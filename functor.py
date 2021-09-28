@@ -6,7 +6,8 @@ from sympy import (
     Add,
     Integer,
     Symbol,
-    I
+    I,
+    Rational
 )
 
 from typing import Tuple
@@ -33,7 +34,8 @@ class Functor:
         print(fn2.smooth())
         fn3 = Functor(self.f.subs({self.x: 2*self.x, self.y: 2*self.y + 1}))
         print(fn3.smooth())
-        fn4 = Functor(self.f.subs({self.x: 2*self.x + 1, self.y: 2*self.y + 1}))
+        fn4 = Functor(self.f.subs(
+            {self.x: 2*self.x + 1, self.y: 2*self.y + 1}))
         print(fn4.smooth())
         print(self.f)
         pprint(self.f)
@@ -57,30 +59,6 @@ class Functor:
 
     def smooth(self) -> Add:
         return (self.f
-                .subs((-1)**((-1)**self.x/2),  I*(-1)**self.x)
-                # 0, 3, 4, 7, ... => 1 -1 1 -1
-                .subs((-1)**(2*self.y + (1 - (-1)**self.y)/2), (-1)**self.y)
-                # 0, 3, 4, 7, ... => 1 -1 1 -1
-                .subs((-1)**(2*self.x + (1 - (-1)**self.x)/2), (-1)**self.x)
-
-                # 0, 1, 4, 5, ... => 1 -1 1 -1
-                .subs((-1)**(2*self.y - (1 - (-1)**self.y)/2), (-1)**self.y)
-                # 0, 1, 4, 5, ... => 1 -1 1 -1
-                .subs((-1)**(2*self.x - (1 - (-1)**self.x)/2), (-1)**self.x)
-
-                # 1, 2, 5, 6, ... => -1 1 -1 1
-                .subs((-1)**(2*self.x - (1 - (-1)**self.x)/2 + 1), (-1)**(self.x + 1))
-                .subs((-1)**(2*self.y - (1 - (-1)**self.y)/2 + 1), (-1)**(self.y + 1))
-
-                # 2, 3, 6, 7, ... => 1 -1 1 -1
-                .subs((-1)**(2*self.y - (1 - (-1)**self.y)/2 + 2), (-1)**self.y)
-                .subs((-1)**(2*self.x - (1 - (-1)**self.x)/2 + 2), (-1)**self.x)
-
-                .subs((-1)**(self.x - (1 - (-1)**self.y) / 2), (-1)**(self.x + self.y))
-                .subs((-1)**(self.y - (1 - (-1)**self.x) / 2), (-1)**(self.x + self.y))
-                .subs((-1)**(self.x + (1 - (-1)**self.y) / 2), (-1)**(self.x + self.y))
-                .subs((-1)**(self.y + (1 - (-1)**self.x) / 2), (-1)**(self.x + self.y))
-
                 .expand()
 
                 .subs((-1)**(2*self.y), 1)
@@ -88,7 +66,14 @@ class Functor:
                 .subs((-1)**(3*self.y), (-1)**self.y)
                 .subs((-1)**(3*self.x), (-1)**self.x)
                 .subs((-1)**((-1)**self.x), -1)
-                .subs((-1)**((-1)**self.y), -1))
+                .subs((-1)**((-1)**self.y), -1)
+                .subs((-1)**(-(-1)**self.x/2), I*(-1)**(self.x + 1))
+                .subs((-1)**(-(-1)**self.y/2), I*(-1)**(self.y + 1))
+                .subs((-1)**(self.y + 1), -1*(-1)**(self.y))
+                .subs((-1)**(self.y - 1), -1*(-1)**(self.y))
+                .subs((-1)**(self.x + 1), -1*(-1)**(self.x))
+                .subs((-1)**(self.x - 1), -1*(-1)**(self.x))
+            )
 
     def matcher(
         self,
@@ -105,10 +90,8 @@ class Functor:
 
         if m == [[1, 0, 1, 0], [1, 0, 1, 0], [1, 0, 1, 0], [1, 0, 1, 0]]:
             return True, {self.x: 2*self.x + 1}, False
-
         elif m == [[0, 1, 0, 1], [0, 1, 0, 1], [0, 1, 0, 1], [0, 1, 0, 1]]:
             return True, {self.x: 2*self.x}, False
-
         elif m == [[1, 1, 1, 1], [1, 0, 1, 0], [1, 1, 1, 1], [1, 0, 1, 0]]:
             return True, {self.x: 2*self.x + 1, self.y: 2*self.y + 1}, False
 
@@ -123,7 +106,9 @@ class Functor:
         elif m == [[1, 1, 1, 1], [1, 0, 1, 0], [0, 0, 0, 0], [0, 1, 0, 1]]:
             return False, {self.y: self.y - (1 - (-1)**self.x) / 2}, False
         elif m == [[1, 1, 1, 1], [0, 1, 0, 1], [0, 0, 0, 0], [1, 0, 1, 0]]:
-            return False, {self.y: self.y - (1 - (-1)**self.x) / 2}, False
+            return False, {self.y: self.y + (1 - (-1)**self.x) / 2}, False
+        elif m == [[0, 0, 0, 0], [1, 0, 1, 0], [1, 1, 1, 1], [0, 1, 0, 1]]:
+            return False, {self.y: self.y + (1 - (-1)**self.x) / 2}, False
 
         elif m == [[0, 1, 1, 0], [0, 0, 1, 1], [0, 1, 1, 0], [0, 0, 1, 1]]:
             return False, {self.x: self.x + (1 - (-1)**self.y) / 2}, False
@@ -143,44 +128,29 @@ class Functor:
         elif m == [[1, 0, 1, 0], [0, 1, 0, 1], [0, 1, 0, 1], [1, 0, 1, 0]]:
             return False, {self.y: self.y + 1 - (-1)**self.x}, False
 
-        elif m == [[0, 0, 1, 1], [1, 1, 0, 0], [1, 1, 0, 0], [0, 0, 1, 1]]:
-            return False, {self.x: self.x - 1}, False
-        
-        elif m == [[0, 1, 1, 0], [0, 0, 1, 1], [0, 0, 1, 1], [1, 0, 0, 1]]:
-            return False, {self.x: self.x - (1-(-1)**self.x)/2 + self.y + 1}, False
-
         elif m == [[0, 0, 0, 0], [1, 1, 1, 1], [1, 1, 1, 1], [0, 0, 0, 0]]:
             return True, {self.y: 2*self.y + (1 - (-1)**self.y) / 2}, False
-
         elif m == [[0, 1, 1, 0], [0, 1, 1, 0], [0, 1, 1, 0], [0, 1, 1, 0]]:
             return True, {self.x: 2*self.x + (1 - (-1)**self.x) / 2}, False
-
         elif m == [[0, 0, 1, 1], [0, 0, 1, 1], [0, 0, 1, 1], [0, 0, 1, 1]]:
             return True, {self.x: 2*self.x - (1 - (-1)**self.x) / 2}, False
-
         elif m == [[0, 0, 0, 0], [0, 0, 0, 0], [1, 1, 1, 1], [1, 1, 1, 1]]:
             return True, {self.y: 2*self.y - (1 - (-1)**self.y) / 2}, False
-
         elif m == [[1, 0, 0, 1], [1, 0, 0, 1], [1, 0, 0, 1], [1, 0, 0, 1]]:
             return True, {self.x: 2*self.x - (1 - (-1)**self.x) / 2 + 1}, False
-
         elif m == [[1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0], [1, 1, 1, 1]]:
             return True, {self.y: 2*self.y - (1 - (-1)**self.y) / 2 + 1}, False
-
         elif m == [[1, 1, 0, 0], [1, 1, 0, 0], [1, 1, 0, 0], [1, 1, 0, 0]]:
             return True, {self.x: 2*self.x - (1 - (-1)**self.x) / 2 + 2}, False
-
         elif m == [[1, 1, 1, 1], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]]:
             return True, {self.y: 2*self.y - (1 - (-1)**self.y) / 2 + 2}, False
 
-        elif m == [[1, 0, 0, 1], [0, 1, 1, 0], [0, 1, 1, 0], [1, 0, 0, 1]]:
-            return False, rotator, True
-        elif m == [[1, 1, 0, 0], [1, 1, 0, 0], [0, 0, 1, 1], [0, 0, 1, 1]]:
+        elif m in [[[1, 0, 0, 1], [0, 1, 1, 0], [0, 1, 1, 0], [1, 0, 0, 1]],
+                   [[1, 1, 0, 0], [1, 1, 0, 0], [0, 0, 1, 1], [0, 0, 1, 1]],
+                   [[0, 1, 1, 0], [1, 0, 0, 1], [1, 0, 0, 1], [0, 1, 1, 0]]]:
             return False, rotator, True
         # elif m == [[0, 0, 1, 1], [0, 1, 1, 0], [1, 1, 0, 0], [1, 0, 0, 1]]:
         #     return False, rotator, True
-        elif m == [[0, 1, 1, 0], [1, 0, 0, 1], [1, 0, 0, 1], [0, 1, 1, 0]]:
-            return False, rotator, True
         # elif m == [[1, 0, 0, 1], [0, 0, 1, 1], [0, 1, 1, 0], [1, 1, 0, 0]]:
         #     return False, rotator, True
         # elif m == [[0, 1, 1, 0], [1, 0, 1, 0], [1, 0, 0, 1], [0, 1, 0, 1]]:

@@ -5,7 +5,8 @@ from sympy import (
     pprint,
     Add,
     Integer,
-    Symbol
+    Symbol,
+    I
 )
 
 from typing import Tuple
@@ -26,13 +27,22 @@ class Functor:
             self.f = z
 
     def print(self):
-        print_maple_code(self.f)
+        fn1 = Functor(self.f.subs({self.x: 2*self.x, self.y: 2*self.y}))
+        print(fn1.smooth())
+        fn2 = Functor(self.f.subs({self.x: 2*self.x + 1, self.y: 2*self.y}))
+        print(fn2.smooth())
+        fn3 = Functor(self.f.subs({self.x: 2*self.x, self.y: 2*self.y + 1}))
+        print(fn3.smooth())
+        fn4 = Functor(self.f.subs({self.x: 2*self.x + 1, self.y: 2*self.y + 1}))
+        print(fn4.smooth())
+        print(self.f)
         pprint(self.f)
+        print(self.f)
         matrix_print(self.gen_matrix())
         sep_print()
 
     def gen_matrix(self, m=4) -> list[list[Integer]]:
-        return [[Mod(self.f, 2).subs({self.x: i, self.y: j}) for i in range(m)] for j in range(m)]
+        return [[Integer(Mod(self.f, 2).subs({self.x: i, self.y: j})) for i in range(m)] for j in range(m)]
 
     def lift(self, rotate_x: bool) -> Tuple[Add, bool, bool]:
         do_division, sub_expression, is_rotated = self.matcher(
@@ -47,6 +57,7 @@ class Functor:
 
     def smooth(self) -> Add:
         return (self.f
+                .subs((-1)**((-1)**self.x/2),  I*(-1)**self.x)
                 # 0, 3, 4, 7, ... => 1 -1 1 -1
                 .subs((-1)**(2*self.y + (1 - (-1)**self.y)/2), (-1)**self.y)
                 # 0, 3, 4, 7, ... => 1 -1 1 -1
@@ -108,12 +119,12 @@ class Functor:
 
         elif m == [[1, 1, 0, 0], [1, 0, 0, 1], [1, 1, 0, 0], [1, 0, 0, 1]]:
             return False, {self.x: self.x - (1 - (-1)**self.y) / 2}, False
-        elif m == [[1, 0, 0, 1], [0, 1, 1, 0], [0, 1, 1, 0], [1, 0, 0, 1]]:
-            return False, {self.x: self.x - (1 - (-1)**self.y) / 2}, False
 
         elif m == [[1, 1, 1, 1], [1, 0, 1, 0], [0, 0, 0, 0], [0, 1, 0, 1]]:
             return False, {self.y: self.y - (1 - (-1)**self.x) / 2}, False
-        
+        elif m == [[1, 1, 1, 1], [0, 1, 0, 1], [0, 0, 0, 0], [1, 0, 1, 0]]:
+            return False, {self.y: self.y - (1 - (-1)**self.x) / 2}, False
+
         elif m == [[0, 1, 1, 0], [0, 0, 1, 1], [0, 1, 1, 0], [0, 0, 1, 1]]:
             return False, {self.x: self.x + (1 - (-1)**self.y) / 2}, False
 
@@ -131,13 +142,16 @@ class Functor:
             return False, {self.y: self.y + 1 - (-1)**self.x}, False
         elif m == [[1, 0, 1, 0], [0, 1, 0, 1], [0, 1, 0, 1], [1, 0, 1, 0]]:
             return False, {self.y: self.y + 1 - (-1)**self.x}, False
-        
+
         elif m == [[0, 0, 1, 1], [1, 1, 0, 0], [1, 1, 0, 0], [0, 0, 1, 1]]:
             return False, {self.x: self.x - 1}, False
+        
+        elif m == [[0, 1, 1, 0], [0, 0, 1, 1], [0, 0, 1, 1], [1, 0, 0, 1]]:
+            return False, {self.x: self.x - (1-(-1)**self.x)/2 + self.y + 1}, False
 
         elif m == [[0, 0, 0, 0], [1, 1, 1, 1], [1, 1, 1, 1], [0, 0, 0, 0]]:
             return True, {self.y: 2*self.y + (1 - (-1)**self.y) / 2}, False
-        
+
         elif m == [[0, 1, 1, 0], [0, 1, 1, 0], [0, 1, 1, 0], [0, 1, 1, 0]]:
             return True, {self.x: 2*self.x + (1 - (-1)**self.x) / 2}, False
 
@@ -149,7 +163,7 @@ class Functor:
 
         elif m == [[1, 0, 0, 1], [1, 0, 0, 1], [1, 0, 0, 1], [1, 0, 0, 1]]:
             return True, {self.x: 2*self.x - (1 - (-1)**self.x) / 2 + 1}, False
-        
+
         elif m == [[1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0], [1, 1, 1, 1]]:
             return True, {self.y: 2*self.y - (1 - (-1)**self.y) / 2 + 1}, False
 
@@ -158,15 +172,19 @@ class Functor:
 
         elif m == [[1, 1, 1, 1], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]]:
             return True, {self.y: 2*self.y - (1 - (-1)**self.y) / 2 + 2}, False
-        
+
+        elif m == [[1, 0, 0, 1], [0, 1, 1, 0], [0, 1, 1, 0], [1, 0, 0, 1]]:
+            return False, rotator, True
         elif m == [[1, 1, 0, 0], [1, 1, 0, 0], [0, 0, 1, 1], [0, 0, 1, 1]]:
             return False, rotator, True
-        elif m == [[0, 0, 1, 1], [0, 1, 1, 0], [1, 1, 0, 0], [1, 0, 0, 1]]:
-            return False, rotator, True
+        # elif m == [[0, 0, 1, 1], [0, 1, 1, 0], [1, 1, 0, 0], [1, 0, 0, 1]]:
+        #     return False, rotator, True
         elif m == [[0, 1, 1, 0], [1, 0, 0, 1], [1, 0, 0, 1], [0, 1, 1, 0]]:
             return False, rotator, True
-        elif m == [[1, 0, 0, 1], [0, 0, 1, 1], [0, 1, 1, 0], [1, 1, 0, 0]]:
-            return False, rotator, True
+        # elif m == [[1, 0, 0, 1], [0, 0, 1, 1], [0, 1, 1, 0], [1, 1, 0, 0]]:
+        #     return False, rotator, True
+        # elif m == [[0, 1, 1, 0], [1, 0, 1, 0], [1, 0, 0, 1], [0, 1, 0, 1]]:
+        #     return False, rotator, False
 
         else:
-            raise "Invalid pattern"
+            raise BaseException("Invalid pattern")

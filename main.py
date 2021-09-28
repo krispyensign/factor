@@ -1,17 +1,22 @@
 from functor import Functor
 from utils import matrix_print
+from sympy import print_maple_code, symbols
 
 if __name__ == "__main__":
     # initialize everything
-    fn = Functor(43*107)
+    N = 43*107
+    fn = Functor(N)
     bits = 0
     rotate_x = False
 
     # loop through the constructions
-    for i in range(15):
+    for i in range(18):
         # print some stats
         print("Iteration: " + str(i))
         print("Bits reduced: " + str(bits))
+        if 2**bits > N//2:
+            break
+
         fn.print()
 
         # perform the lift and record what happened
@@ -30,4 +35,4 @@ if __name__ == "__main__":
 
     print("Bits reduced: " + str(bits))
     fn.print()
-    matrix_print(fn.gen_matrix(m=4))
+    matrix_print(fn.gen_matrix(m=8))

@@ -1,20 +1,21 @@
 from functor import Functor
 from utils import matrix_print
-from sympy import print_maple_code, symbols
+from sympy import print_maple_code, symbols, sqrt
 
 if __name__ == "__main__":
     # initialize everything
-    N = 43*107
+    N = 91
     fn = Functor(N)
     bits = 0
     rotate_x = False
 
     # loop through the constructions
-    for i in range(18):
+    for i in range(19):
         # print some stats
         print("Iteration: " + str(i))
         print("Bits reduced: " + str(bits))
-        if 2**bits > N//2:
+        print("Sqrt N bits: " + str(len(bin(int(N**(1/2))))))
+        if bits > len(bin(int(N**(1/2)))):
             break
 
         fn.print()

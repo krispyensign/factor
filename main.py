@@ -4,7 +4,7 @@ from sympy import print_maple_code, symbols, sqrt
 
 if __name__ == "__main__":
     # initialize everything
-    N = 91
+    N = 13 * 37
     fn = Functor(N)
     bits = 0
     rotate_x = False
@@ -15,7 +15,7 @@ if __name__ == "__main__":
         print("Iteration: " + str(i))
         print("Bits reduced: " + str(bits))
         print("Sqrt N bits: " + str(len(bin(int(N**(1/2))))))
-        if bits > len(bin(int(N**(1/2)))):
+        if bits >= len(bin(int(N**(1/2)))):
             break
 
         fn.print()

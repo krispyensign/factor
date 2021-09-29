@@ -39,7 +39,7 @@ class Functor:
             Functor(self.f.subs({self.x: 2*self.x, self.y: 2*self.y + 1})).smooth())
         print(
             Functor(self.f.subs({self.x: 2*self.x + 1, self.y: 2*self.y + 1})).smooth())
-        
+
         # print the matrix
         matrix_print(self.gen_matrix())
 
@@ -54,7 +54,7 @@ class Functor:
         # perform pattern match to get the subexpression and various flags
         do_division, sub_expression, is_rotated = self.matcher(
             self.gen_matrix(), rotate_x=rotate_x)
-        
+
         # pretty print the sub expression
         pprint(sub_expression)
 
@@ -139,7 +139,7 @@ class Functor:
             return True, {self.x: 2*self.x - (1 - (-1)**self.x) / 2 + 2}, False
         elif m == [[1, 1, 1, 1], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]]:
             return True, {self.y: 2*self.y - (1 - (-1)**self.y) / 2 + 2}, False
-        
+
         elif m in [[[1, 1, 1, 1], [1, 0, 1, 0], [0, 0, 0, 0], [0, 1, 0, 1]],
                    [[0, 0, 0, 0], [0, 1, 0, 1], [1, 1, 1, 1], [1, 0, 1, 0]],
                    [[0, 1, 0, 1], [1, 1, 1, 1], [1, 0, 1, 0], [0, 0, 0, 0]],

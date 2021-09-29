@@ -4,7 +4,7 @@ from sympy import print_maple_code, symbols, sqrt
 
 if __name__ == "__main__":
     # initialize everything
-    N = 13 * 37
+    N = 13 * 47
     fn = Functor(N)
     bits = 0
     rotate_x = False

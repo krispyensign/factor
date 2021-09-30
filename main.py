@@ -29,9 +29,6 @@ if __name__ == "__main__":
         # create a new functor object based on the constructed function
         fn = Functor(function)
 
-        if fn.attempt_solve() and bits >= 2:
-            break
-
     print("Bits reduced: " + str(bits))
     fn.print()
     matrix_print(fn.gen_matrix(m=8))

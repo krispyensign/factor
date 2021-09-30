@@ -68,49 +68,6 @@ class Functor:
 
         return f, do_division
 
-    def attempt_solve(self) -> bool:
-        # if len(roots(Functor(self.f.subs(
-        #         {self.x: 2*self.x, self.y: 2*self.y})).smooth().subs({self.y: -self.x}), self.x, filter='Z')) >= 1:
-        #     return True
-        # elif len(roots(Functor(self.f.subs(
-        #     {self.x: 2*self.x, self.y: 2*self.y})).smooth().subs({self.y: 0}), self.x, filter='Z')) >= 1:
-        #     return True
-        # elif len(roots(Functor(self.f.subs(
-        #     {self.x: 2*self.x, self.y: 2*self.y})).smooth().subs({self.x: 0}), self.x, filter='Z')) >= 1:
-        #     return True
-
-        # if len(roots(Functor(self.f.subs(
-        #         {self.x: 2*self.x + 1, self.y: 2*self.y})).smooth().subs({self.y: -self.x}), self.x, filter='Z')) >= 1:
-        #     return True
-        # elif len(roots(Functor(self.f.subs(
-        #     {self.x: 2*self.x + 1, self.y: 2*self.y})).smooth().subs({self.y: 0}), self.x, filter='Z')) >= 1:
-        #     return True
-        # elif len(roots(Functor(self.f.subs(
-        #     {self.x: 2*self.x + 1, self.y: 2*self.y})).smooth().subs({self.x: 0}), self.x, filter='Z')) >= 1:
-        #     return True
-
-        # if len(roots(Functor(self.f.subs(
-        #         {self.x: 2*self.x, self.y: 2*self.y + 1})).smooth().subs({self.y: -self.x}), self.x, filter='Z')) >= 1:
-        #     return True
-        # elif len(roots(Functor(self.f.subs(
-        #     {self.x: 2*self.x, self.y: 2*self.y + 1})).smooth().subs({self.y: 0}), self.x, filter='Z')) >= 1:
-        #     return True
-        # elif len(roots(Functor(self.f.subs(
-        #     {self.x: 2*self.x, self.y: 2*self.y + 1})).smooth().subs({self.x: 0}), self.x, filter='Z')) >= 1:
-        #     return True
-
-        # if len(roots(Functor(self.f.subs(
-        #         {self.x: 2*self.x + 1, self.y: 2*self.y + 1})).smooth().subs({self.y: -self.x}), self.x, filter='Z')) >= 1:
-        #     return True
-        # elif len(roots(Functor(self.f.subs(
-        #     {self.x: 2*self.x + 1, self.y: 2*self.y + 1})).smooth().subs({self.y: 0}), self.x, filter='Z')) >= 1:
-        #     return True
-        # elif len(roots(Functor(self.f.subs(
-        #     {self.x: 2*self.x + 1, self.y: 2*self.y + 1})).smooth().subs({self.x: 0}), self.x, filter='Z')) >= 1:
-        #     return True
-
-        return False
-
     def smooth(self) -> Add:
         # replace complicated exponents with simpler isomorphic exponents over the integers
         return (self.f

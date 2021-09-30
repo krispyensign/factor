@@ -7,7 +7,6 @@ if __name__ == "__main__":
     N = 313 * 223
     fn = Functor(N)
     bits = 0
-    rotate_x = False
 
     # loop through the constructions
     for i in range(19):
@@ -21,11 +20,7 @@ if __name__ == "__main__":
         fn.print()
 
         # perform the lift and record what happened
-        function, is_reduced, is_rotated = fn.lift(rotate_x=rotate_x)
-
-        # flip the rotation bit if the function was rotated.  allows for even distribution
-        if is_rotated:
-            rotate_x = not rotate_x
+        function, is_reduced = fn.lift()
 
         # if a reduction occurred then record it
         if is_reduced is True:

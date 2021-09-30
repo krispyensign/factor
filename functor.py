@@ -51,10 +51,10 @@ class Functor:
         # generate the m x m (default = 4 x 4) binary matrix
         return [[Integer(Mod(self.f, 2).subs({self.x: i, self.y: j})) for i in range(m)] for j in range(m)]
 
-    def lift(self, rotate_x: bool) -> Tuple[Add, bool, bool]:
+    def lift(self) -> Tuple[Add, bool]:
         # perform pattern match to get the subexpression and various flags
-        do_division, sub_expression, is_rotated = self.matcher(
-            self.gen_matrix(), rotate_x=rotate_x)
+        do_division, sub_expression = self.matcher(
+            self.gen_matrix())
 
         # pretty print the sub expression
         pprint(sub_expression)
@@ -66,7 +66,7 @@ class Functor:
         if do_division is True:
             f /= 2
 
-        return f, do_division, is_rotated
+        return f, do_division
 
     def attempt_solve(self) -> bool:
         # if len(roots(Functor(self.f.subs(
@@ -137,74 +137,73 @@ class Functor:
     def matcher(
         self,
         m: list[list[Integer]],
-        rotate_x: bool
-    ) -> Tuple[bool, dict[Symbol, Add], bool]:
+    ) -> Tuple[bool, dict[Symbol, Add]]:
         # perform pattern matching
         if m == [[1, 0, 1, 0], [1, 0, 1, 0], [1, 0, 1, 0], [1, 0, 1, 0]]:
-            return True, {self.x: 2*self.x + 1}, False
+            return True, {self.x: 2*self.x + 1}
         elif m == [[0, 1, 0, 1], [0, 1, 0, 1], [0, 1, 0, 1], [0, 1, 0, 1]]:
-            return True, {self.x: 2*self.x}, False
+            return True, {self.x: 2*self.x}
         elif m == [[1, 1, 1, 1], [1, 0, 1, 0], [1, 1, 1, 1], [1, 0, 1, 0]]:
-            return True, {self.x: 2*self.x + 1, self.y: 2*self.y + 1}, False
+            return True, {self.x: 2*self.x + 1, self.y: 2*self.y + 1}
         elif m == [[1, 1, 0, 0], [1, 1, 0, 0], [0, 0, 1, 1], [0, 0, 1, 1]]:
-            return True, {self.y: 2*self.y}, False
+            return True, {self.y: 2*self.y}
 
         elif m == [[1, 1, 0, 0], [1, 0, 0, 1], [1, 1, 0, 0], [1, 0, 0, 1]]:
-            return False, {self.x: self.x + (1 - (-1)**(self.y + 1)) / 2}, False
+            return False, {self.x: self.x + (1 - (-1)**(self.y + 1)) / 2}
         elif m == [[0, 0, 1, 1], [0, 1, 1, 0], [0, 0, 1, 1], [0, 1, 1, 0]]:
-            return False, {self.x: self.x + (1 - (-1)**(self.y + 1)) / 2}, False
+            return False, {self.x: self.x + (1 - (-1)**(self.y + 1)) / 2}
 
         elif m == [[1, 1, 0, 0], [0, 0, 1, 1], [1, 1, 0, 0], [0, 0, 1, 1]]:
-            return False, {self.x: self.x + 1 - (-1)**(self.y + 1)}, False
+            return False, {self.x: self.x + 1 - (-1)**(self.y + 1)}
         elif m == [[0, 0, 1, 1], [1, 1, 0, 0], [0, 0, 1, 1], [1, 1, 0, 0]]:
-            return False, {self.x: self.x + 1 - (-1)**(self.y + 1)}, False
+            return False, {self.x: self.x + 1 - (-1)**(self.y + 1)}
         elif m == [[0, 1, 1, 0], [1, 0, 0, 1], [0, 1, 1, 0], [1, 0, 0, 1]]:
-            return False, {self.x: self.x + 1 - (-1)**(self.y + 1)}, False
+            return False, {self.x: self.x + 1 - (-1)**(self.y + 1)}
 
         elif m == [[1, 0, 0, 1], [0, 1, 1, 0], [1, 0, 0, 1], [0, 1, 1, 0]]:
-            return False, {self.x: self.x + 1 - (-1)**self.y}, False
+            return False, {self.x: self.x + 1 - (-1)**self.y}
 
         elif m == [[0, 0, 0, 0], [1, 1, 1, 1], [1, 1, 1, 1], [0, 0, 0, 0]]:
-            return True, {self.y: 2*self.y + (1 - (-1)**self.y) / 2}, False
+            return True, {self.y: 2*self.y + (1 - (-1)**self.y) / 2}
         elif m == [[0, 1, 1, 0], [0, 1, 1, 0], [0, 1, 1, 0], [0, 1, 1, 0]]:
-            return True, {self.x: 2*self.x + (1 - (-1)**self.x) / 2}, False
+            return True, {self.x: 2*self.x + (1 - (-1)**self.x) / 2}
         elif m == [[0, 0, 1, 1], [0, 0, 1, 1], [0, 0, 1, 1], [0, 0, 1, 1]]:
-            return True, {self.x: 2*self.x - (1 - (-1)**self.x) / 2}, False
+            return True, {self.x: 2*self.x - (1 - (-1)**self.x) / 2}
         elif m == [[0, 0, 0, 0], [0, 0, 0, 0], [1, 1, 1, 1], [1, 1, 1, 1]]:
-            return True, {self.y: 2*self.y - (1 - (-1)**self.y) / 2}, False
+            return True, {self.y: 2*self.y - (1 - (-1)**self.y) / 2}
         elif m == [[1, 0, 0, 1], [1, 0, 0, 1], [1, 0, 0, 1], [1, 0, 0, 1]]:
-            return True, {self.x: 2*self.x - (1 - (-1)**self.x) / 2 + 1}, False
+            return True, {self.x: 2*self.x - (1 - (-1)**self.x) / 2 + 1}
         elif m == [[1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0], [1, 1, 1, 1]]:
-            return True, {self.y: 2*self.y - (1 - (-1)**self.y) / 2 + 1}, False
+            return True, {self.y: 2*self.y - (1 - (-1)**self.y) / 2 + 1}
         elif m == [[1, 1, 0, 0], [1, 1, 0, 0], [1, 1, 0, 0], [1, 1, 0, 0]]:
-            return True, {self.x: 2*self.x - (1 - (-1)**self.x) / 2 + 2}, False
+            return True, {self.x: 2*self.x - (1 - (-1)**self.x) / 2 + 2}
         elif m == [[1, 1, 1, 1], [1, 1, 1, 1], [0, 0, 0, 0], [0, 0, 0, 0]]:
-            return True, {self.y: 2*self.y - (1 - (-1)**self.y) / 2 + 2}, False
+            return True, {self.y: 2*self.y - (1 - (-1)**self.y) / 2 + 2}
 
         elif m in [[[1, 1, 1, 1], [1, 0, 1, 0], [0, 0, 0, 0], [0, 1, 0, 1]],
                    [[0, 0, 0, 0], [0, 1, 0, 1], [1, 1, 1, 1], [1, 0, 1, 0]],
                    [[0, 1, 0, 1], [1, 1, 1, 1], [1, 0, 1, 0], [0, 0, 0, 0]],
                    [[1, 0, 1, 0], [0, 0, 0, 0], [0, 1, 0, 1], [1, 1, 1, 1]]]:
-            return False, {self.y: self.y + (1 - (-1)**(self.x + 1)) / 2}, False
+            return False, {self.y: self.y + (1 - (-1)**(self.x + 1)) / 2}
 
         elif m in [[[1, 1, 1, 1], [0, 1, 0, 1], [0, 0, 0, 0], [1, 0, 1, 0]],
                    [[0, 0, 0, 0], [1, 0, 1, 0], [1, 1, 1, 1], [0, 1, 0, 1]],
                    [[0, 1, 0, 1], [0, 0, 0, 0], [1, 0, 1, 0], [1, 1, 1, 1]],
                    [[1, 0, 1, 0], [1, 1, 1, 1], [0, 1, 0, 1], [0, 0, 0, 0]]]:
-            return False, {self.y: self.y + (1 - (-1)**self.x) / 2}, False
+            return False, {self.y: self.y + (1 - (-1)**self.x) / 2}
 
         elif m in [[[1, 0, 1, 0], [0, 1, 0, 1], [1, 0, 1, 0], [0, 1, 0, 1]],
                    [[0, 1, 0, 1], [1, 0, 1, 0], [0, 1, 0, 1], [1, 0, 1, 0]],
                    [[0, 1, 1, 0], [0, 0, 1, 1], [0, 1, 1, 0], [0, 0, 1, 1]],
                    [[1, 0, 0, 1], [1, 1, 0, 0], [1, 0, 0, 1], [1, 1, 0, 0]],
                    [[0, 1, 0, 1], [1, 0, 0, 1], [1, 0, 1, 0], [0, 1, 1, 0]]]:
-            return False, {self.x: self.x + (1 - (-1)**self.y) / 2}, False
+            return False, {self.x: self.x + (1 - (-1)**self.y) / 2}
 
         elif m in [[[0, 1, 0, 1], [0, 1, 0, 1], [1, 0, 1, 0], [1, 0, 1, 0]],
                    [[0, 1, 0, 1], [1, 0, 1, 0], [1, 0, 1, 0], [0, 1, 0, 1]],
                    [[1, 0, 1, 0], [1, 0, 1, 0], [0, 1, 0, 1], [0, 1, 0, 1]],
                    [[1, 0, 1, 0], [0, 1, 0, 1], [0, 1, 0, 1], [1, 0, 1, 0]]]:
-            return False, {self.y: self.y + 1 - (-1)**self.x}, False
+            return False, {self.y: self.y + 1 - (-1)**self.x}
 
         else:
             raise BaseException("Invalid pattern")

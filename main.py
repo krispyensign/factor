@@ -4,7 +4,7 @@ from sympy import print_maple_code, symbols, sqrt
 
 if __name__ == "__main__":
     # initialize everything
-    N = 13 * 47
+    N = 313 * 223
     fn = Functor(N)
     bits = 0
     rotate_x = False
@@ -33,6 +33,9 @@ if __name__ == "__main__":
 
         # create a new functor object based on the constructed function
         fn = Functor(function)
+
+        if fn.attempt_solve() and bits >= 2:
+            break
 
     print("Bits reduced: " + str(bits))
     fn.print()

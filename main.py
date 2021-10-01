@@ -1,6 +1,5 @@
 from functor import Functor
 from utils import matrix_print
-from sympy import print_maple_code, symbols, sqrt
 
 if __name__ == "__main__":
     # initialize everything

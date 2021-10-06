@@ -3,7 +3,8 @@ from utils import matrix_print
 
 if __name__ == "__main__":
     # initialize everything
-    N = 313 * 223
+    N = 313 * 107
+    # N = 313 * 223
     # N = 91
     fn = Functor(N)
     bits = 0
@@ -27,8 +28,8 @@ if __name__ == "__main__":
                 rotation = not rotation
 
         except:
-            matrix_print(fn.gen_matrix(m=8))
             print("Trying 2...")
+            matrix_print(fn.gen_matrix(m=8))
             fn.print()
             fn = Functor(fn.f * 2)
             try:

@@ -33,14 +33,13 @@ class Functor:
         print(self.f)
 
         # print the 4 sub functions
-        print(
-            Functor(self.f.subs({self.x: 2*self.x, self.y: 2*self.y})).smooth())
-        print(
-            Functor(self.f.subs({self.x: 2*self.x + 1, self.y: 2*self.y})).smooth())
-        print(
-            Functor(self.f.subs({self.x: 2*self.x, self.y: 2*self.y + 1})).smooth())
-        print(
-            Functor(self.f.subs({self.x: 2*self.x + 1, self.y: 2*self.y + 1})).smooth())
+        pprint(Functor(self.f.subs({self.x: 2*self.x, self.y: 2*self.y})).f)
+        pprint(
+            Functor(self.f.subs({self.x: 2*self.x + 1, self.y: 2*self.y})).f)
+        pprint(
+            Functor(self.f.subs({self.x: 2*self.x, self.y: 2*self.y + 1})).f)
+        pprint(
+            Functor(self.f.subs({self.x: 2*self.x + 1, self.y: 2*self.y + 1})).f)
 
         # print the matrix
         matrix_print(self.gen_matrix())
@@ -61,7 +60,7 @@ class Functor:
         pprint(sub_expression)
 
         # create a new function with the sub expression and smooth it for faster processing
-        f = Functor(Functor(self.f.subs(sub_expression)).smooth()).smooth()
+        f = Functor(self.f.subs(sub_expression)).f
 
         # if the sub expression is 2*x + w or 2*y + w then divide by two
         if do_division is True:
@@ -123,20 +122,66 @@ class Functor:
             return True, {self.x: 2*self.x + 1, self.y: 2*self.y + 1}, False
 
         # match rotations
-        elif m in [[[1, 1, 0, 0],
+        elif m in [[[0, 0, 1, 1],
+                    [0, 0, 1, 1],
+                    [1, 1, 0, 0],
+                    [1, 1, 0, 0]],
+                   
+                   [[1, 0, 0, 1],
+                    [1, 0, 0, 1],
+                    [0, 1, 1, 0],
+                    [0, 1, 1, 0]],
+
+                   [[1, 1, 0, 0],
                     [1, 1, 0, 0],
                     [0, 0, 1, 1],
                     [0, 0, 1, 1]],
+
+                   [[0, 1, 1, 0],
+                    [0, 1, 1, 0],
+                    [1, 0, 0, 1],
+                    [1, 0, 0, 1]],
+
+
+                   [[1, 0, 0, 1],
+                    [0, 1, 1, 0],
+                    [0, 1, 1, 0],
+                    [1, 0, 0, 1]],
+                   
+                   [[0, 0, 1, 1],
+                    [1, 1, 0, 0],
+                    [1, 1, 0, 0],
+                    [0, 0, 1, 1]],
+                   
+                   [[0, 1, 1, 0],
+                    [1, 0, 0, 1],
+                    [1, 0, 0, 1],
+                    [0, 1, 1, 0]],
+                   
+                   [[1, 1, 0, 0],
+                    [0, 0, 1, 1],
+                    [0, 0, 1, 1],
+                    [1, 1, 0, 0]],
 
                    [[0, 0, 1, 1],
                     [1, 0, 0, 1],
                     [1, 1, 0, 0],
                     [0, 1, 1, 0]],
-
+                   
                    [[1, 0, 0, 1],
                     [1, 1, 0, 0],
                     [0, 1, 1, 0],
-                    [0, 0, 1, 1]]]:
+                    [0, 0, 1, 1]],
+                   
+                   [[1, 1, 0, 0],
+                    [0, 1, 1, 0],
+                    [0, 0, 1, 1],
+                    [1, 0, 0, 1]],
+        
+                   [[0, 1, 1, 0],
+                    [0, 0, 1, 1],
+                    [1, 0, 0, 1],
+                    [1, 1, 0, 0]]]:
             return False, rotator, True
 
         # match complex subexpressions

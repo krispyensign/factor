@@ -25,6 +25,7 @@ class Functor:
             self.f = self.x * self.y - z
         else:
             self.f = z
+            self.f = self.smooth()
 
     def print(self) -> None:
         # print and pretty print the main function
@@ -130,7 +131,12 @@ class Functor:
                    [[0, 0, 1, 1],
                     [1, 0, 0, 1],
                     [1, 1, 0, 0],
-                    [0, 1, 1, 0]]]:
+                    [0, 1, 1, 0]],
+
+                   [[1, 0, 0, 1],
+                    [1, 1, 0, 0],
+                    [0, 1, 1, 0],
+                    [0, 0, 1, 1]]]:
             return False, rotator, True
 
         # match complex subexpressions

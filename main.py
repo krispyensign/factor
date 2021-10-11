@@ -3,7 +3,8 @@ from utils import matrix_print
 
 if __name__ == "__main__":
     # initialize everything
-    N = 313 * 107
+    N = 313 * 11
+    # N = 313 * 107
     # N = 313 * 223
     # N = 91
     fn = Functor(N)

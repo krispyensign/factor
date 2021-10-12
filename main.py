@@ -1,3 +1,4 @@
+from sympy.core import symbols
 from functor import Functor
 from utils import matrix_print
 
@@ -10,6 +11,7 @@ if __name__ == "__main__":
     fn = Functor(N)
     bits = 0
     rotation = False
+    matchFailure = False
 
     # loop through the constructions
     for i in range(19):
@@ -24,12 +26,12 @@ if __name__ == "__main__":
 
         # perform the lift and record what happened
         try:
-            function, is_reduced, is_rotated = fn.lift(rotation)
+            function, is_reduced, is_rotated, _ = fn.lift(rotation)
             if is_rotated is True:
                 rotation = not rotation
 
         except:
-            print("Failed to match...")
+            matchFailure = True
             break
 
         # if a reduction occurred then record it
@@ -42,3 +44,5 @@ if __name__ == "__main__":
     print("Bits reduced: " + str(bits))
     fn.print()
     matrix_print(fn.gen_matrix(m=8))
+    if matchFailure == True:
+        print("Failed to match.")

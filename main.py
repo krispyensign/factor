@@ -17,10 +17,10 @@ if __name__ == "__main__":
         print("Iteration: " + str(i))
         print("Bits reduced: " + str(bits))
         print("Sqrt N bits: " + str(len(bin(int(N**(1/2))))))
+        fn.print()
         if bits >= len(bin(int(N**(1/2)))):
             break
 
-        fn.print()
 
         # perform the lift and record what happened
         try:
@@ -29,17 +29,8 @@ if __name__ == "__main__":
                 rotation = not rotation
 
         except:
-            print("Trying 2...")
-            matrix_print(fn.gen_matrix(m=8))
-            fn.print()
-            fn = Functor(fn.f * 2)
-            try:
-                function, is_reduced, is_rotated = fn.lift(rotation)
-                if is_rotated is True:
-                    rotation = not rotation
-            except:
-                print("Failed to match...")
-                break
+            print("Failed to match...")
+            break
 
         # if a reduction occurred then record it
         if is_reduced is True:

@@ -98,7 +98,6 @@ class Functor:
         flip_rotation: bool,
     ) -> Tuple[bool, dict[Symbol, Add], bool]:
         # setup rotation
-
         rotator = {self.x: self.x + self.y}
         if flip_rotation is True:
             rotator = {self.y: self.x + self.y}

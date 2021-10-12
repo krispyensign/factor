@@ -6,6 +6,7 @@ from sympy import (
     Integer,
     Symbol,
     I,
+    Rational,
     roots
 )
 
@@ -51,7 +52,7 @@ class Functor:
         # generate the m x m (default = 4 x 4) binary matrix
         return [[Integer(Mod(self.f, n).subs({self.x: i, self.y: j})) for i in range(m)] for j in range(m)]
 
-    def lift(self, flip_rotation: bool) -> Tuple[Add, bool, bool]:
+    def lift(self, flip_rotation: bool) -> Tuple[Add, bool, bool, dict[Symbol, Add]]:
         # perform pattern match to get the subexpression and various flags
         do_division, sub_expression, is_rotated = self.matcher(
             self.gen_matrix(), flip_rotation)
@@ -66,7 +67,7 @@ class Functor:
         if do_division is True:
             f /= 2
 
-        return f, do_division, is_rotated
+        return f, do_division, is_rotated, sub_expression
 
     def smooth(self) -> Add:
         # replace complicated exponents with simpler isomorphic exponents over the integers
@@ -115,74 +116,23 @@ class Functor:
                    [0, 1, 0, 1]]:
             return True, {self.x: 2*self.x}, False
 
+        elif m == [[0, 0, 0, 0],
+                   [1, 1, 1, 1],
+                   [0, 0, 0, 0],
+                   [1, 1, 1, 1]]:
+            return True, {self.y: 2*self.y}, False
+
+        elif m == [[1, 1, 1, 1],
+                   [0, 0, 0, 0],
+                   [1, 1, 1, 1],
+                   [0, 0, 0, 0]]:
+            return True, {self.y: 2*self.y + 1}, False
+
         elif m == [[1, 1, 1, 1],
                    [1, 0, 1, 0],
                    [1, 1, 1, 1],
                    [1, 0, 1, 0]]:
             return True, {self.x: 2*self.x + 1, self.y: 2*self.y + 1}, False
-
-        # match rotations
-        elif m in [[[0, 0, 1, 1],
-                    [0, 0, 1, 1],
-                    [1, 1, 0, 0],
-                    [1, 1, 0, 0]],
-                   
-                   [[1, 0, 0, 1],
-                    [1, 0, 0, 1],
-                    [0, 1, 1, 0],
-                    [0, 1, 1, 0]],
-
-                   [[1, 1, 0, 0],
-                    [1, 1, 0, 0],
-                    [0, 0, 1, 1],
-                    [0, 0, 1, 1]],
-
-                   [[0, 1, 1, 0],
-                    [0, 1, 1, 0],
-                    [1, 0, 0, 1],
-                    [1, 0, 0, 1]],
-
-
-                   [[1, 0, 0, 1],
-                    [0, 1, 1, 0],
-                    [0, 1, 1, 0],
-                    [1, 0, 0, 1]],
-                   
-                   [[0, 0, 1, 1],
-                    [1, 1, 0, 0],
-                    [1, 1, 0, 0],
-                    [0, 0, 1, 1]],
-                   
-                   [[0, 1, 1, 0],
-                    [1, 0, 0, 1],
-                    [1, 0, 0, 1],
-                    [0, 1, 1, 0]],
-                   
-                   [[1, 1, 0, 0],
-                    [0, 0, 1, 1],
-                    [0, 0, 1, 1],
-                    [1, 1, 0, 0]],
-
-                   [[0, 0, 1, 1],
-                    [1, 0, 0, 1],
-                    [1, 1, 0, 0],
-                    [0, 1, 1, 0]],
-                   
-                   [[1, 0, 0, 1],
-                    [1, 1, 0, 0],
-                    [0, 1, 1, 0],
-                    [0, 0, 1, 1]],
-                   
-                   [[1, 1, 0, 0],
-                    [0, 1, 1, 0],
-                    [0, 0, 1, 1],
-                    [1, 0, 0, 1]],
-        
-                   [[0, 1, 1, 0],
-                    [0, 0, 1, 1],
-                    [1, 0, 0, 1],
-                    [1, 1, 0, 0]]]:
-            return False, rotator, True
 
         # match complex subexpressions
         elif m == [[0, 0, 1, 1],
@@ -232,6 +182,74 @@ class Functor:
                    [1, 1, 1, 1],
                    [0, 0, 0, 0]]:
             return True, {self.y: 2*self.y + (1 - (-1)**self.y) / 2}, False
+
+        # match rotations
+        elif m in [[[0, 0, 1, 1],
+                    [0, 0, 1, 1],
+                    [1, 1, 0, 0],
+                    [1, 1, 0, 0]],
+
+                   [[1, 0, 0, 1],
+                    [1, 0, 0, 1],
+                    [0, 1, 1, 0],
+                    [0, 1, 1, 0]],
+
+                   [[1, 1, 0, 0],
+                    [1, 1, 0, 0],
+                    [0, 0, 1, 1],
+                    [0, 0, 1, 1]],
+
+                   [[0, 1, 1, 0],
+                    [0, 1, 1, 0],
+                    [1, 0, 0, 1],
+                    [1, 0, 0, 1]],
+
+
+                   [[1, 0, 0, 1],
+                    [0, 1, 1, 0],
+                    [0, 1, 1, 0],
+                    [1, 0, 0, 1]],
+
+                   [[0, 0, 1, 1],
+                    [1, 1, 0, 0],
+                    [1, 1, 0, 0],
+                    [0, 0, 1, 1]],
+
+                   [[0, 1, 1, 0],
+                    [1, 0, 0, 1],
+                    [1, 0, 0, 1],
+                    [0, 1, 1, 0]],
+
+                   [[1, 1, 0, 0],
+                    [0, 0, 1, 1],
+                    [0, 0, 1, 1],
+                    [1, 1, 0, 0]],
+
+                   [[0, 0, 1, 1],
+                    [1, 0, 0, 1],
+                    [1, 1, 0, 0],
+                    [0, 1, 1, 0]],
+
+                   [[1, 0, 0, 1],
+                    [1, 1, 0, 0],
+                    [0, 1, 1, 0],
+                    [0, 0, 1, 1]],
+
+                   [[1, 1, 0, 0],
+                    [0, 1, 1, 0],
+                    [0, 0, 1, 1],
+                    [1, 0, 0, 1]],
+
+                   [[0, 1, 1, 0],
+                    [0, 0, 1, 1],
+                    [1, 0, 0, 1],
+                    [1, 1, 0, 0]],
+
+                   [[1, 0, 0, 1],
+                    [0, 0, 1, 1],
+                    [0, 1, 1, 0],
+                    [1, 1, 0, 0]]]:
+            return False, rotator, True
 
         # match shifting
         elif m in [[[1, 1, 0, 0],

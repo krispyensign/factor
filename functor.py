@@ -1,4 +1,4 @@
-from sympy import (
+from sympy import ( # type: ignore
     Mod,
     symbols,
     pprint,
@@ -7,7 +7,6 @@ from sympy import (
     Symbol,
     I,
     Rational,
-    roots
 )
 
 from typing import Tuple
@@ -71,26 +70,43 @@ class Functor:
 
     def smooth(self) -> Add:
         # replace complicated exponents with simpler isomorphic exponents over the integers
-        return (self.f
+        return (
+            self.f
                 .expand()
-                .subs((-1)**(2*self.y), 1)
-                .subs((-1)**(2*self.x), 1)
-                .subs((-1)**(3*self.y), (-1)**self.y)
-                .subs((-1)**(3*self.x), (-1)**self.x)
-                .subs((-1)**((-1)**self.x), -1)
-                .subs((-1)**((-1)**self.y), -1)
-                .subs((-1)**(-(-1)**self.x/2), I*(-1)**(self.x + 1))
-                .subs((-1)**(-(-1)**self.y/2), I*(-1)**(self.y + 1))
-                .subs((-1)**(self.y + 1), -1*(-1)**(self.y))
-                .subs((-1)**(self.y - 1), -1*(-1)**(self.y))
-                .subs((-1)**(self.x + 1), -1*(-1)**(self.x))
-                .subs((-1)**(self.x - 1), -1*(-1)**(self.x))
-                .subs((-1)**(-self.y + 1), -1*(-1)**(self.y))
-                .subs((-1)**(-self.y - 1), -1*(-1)**(self.y))
-                .subs((-1)**(-self.x + 1), -1*(-1)**(self.x))
-                .subs((-1)**(-self.x - 1), -1*(-1)**(self.x))
-                .subs((-1)**(-self.x), (-1)**(self.x))
-                .subs((-1)**(-self.y), (-1)**(self.y)))
+                .subs({
+                    I**(-2*I**(2*self.x)):      -1,
+                    I**(-2*I**(2*self.y)):      -1,
+                    I**(-I**(2*self.x)):        I**(2*self.x + 1),
+                    I**(-I**(2*self.y)):        I**(2*self.y + 1),
+                    I**(8*self.y):              1,
+                    I**(8*self.x):              1,
+                    I**(6*self.y):              I**(2*self.y),
+                    I**(6*self.x):              I**(2*self.x),
+                    I**(4*self.y):              1,
+                    I**(4*self.x):              1,
+                    I*I**(3*self.x):            I**(3*self.x + 1),
+                    I*I**(self.x):              I**(self.x + 1),
+                })
+                # .xreplace({(-1)**(self.y - I**self.x + I**(3*self.x + 1)/2 - I**(self.x + 1)/2 + Rational(3/2)): 1})
+                # .subs((-1)**(2*self.y), 1)
+                # .subs((-1)**(2*self.x), 1)
+                # .subs((-1)**(3*self.y), I**(2*self.y))
+                # .subs((-1)**(3*self.x), I**(2*self.x))
+                # .subs((-1)**(I**(2*self.x)), -1)
+                # .subs((-1)**(I**(2*self.y)), -1)
+                # .subs((-1)**(-I**(2*self.x)/2), I*(-1)**(self.x + 1))
+                # .subs((-1)**(-I**(2*self.y)/2), I*(-1)**(self.y + 1))
+                # .subs((-1)**(self.y + 1), -1*(-1)**(self.y))
+                # .subs((-1)**(self.y - 1), -1*(-1)**(self.y))
+                # .subs((-1)**(self.x + 1), -1*(-1)**(self.x))
+                # .subs((-1)**(self.x - 1), -1*(-1)**(self.x))
+                # .subs((-1)**(-self.y + 1), -1*(-1)**(self.y))
+                # .subs((-1)**(-self.y - 1), -1*(-1)**(self.y))
+                # .subs((-1)**(-self.x + 1), -1*(-1)**(self.x))
+                # .subs((-1)**(-self.x - 1), -1*(-1)**(self.x))
+                # .subs((-1)**(-self.x), (-1)**(self.x))
+                # .subs((-1)**(-self.y), (-1)**(self.y)))
+        )
 
     def matcher(
         self,
@@ -102,7 +118,7 @@ class Functor:
         if flip_rotation is True:
             rotator = {self.y: self.x + self.y}
 
-        # match simple subexpressions
+        # region match simple subexpressions
         if m == [[1, 0, 1, 0],
                  [1, 0, 1, 0],
                  [1, 0, 1, 0],
@@ -132,57 +148,67 @@ class Functor:
                    [1, 1, 1, 1],
                    [1, 0, 1, 0]]:
             return True, {self.x: 2*self.x + 1, self.y: 2*self.y + 1}, False
+        # endregion
 
-        # match complex subexpressions
+        # region match complex subexpressions
         elif m == [[0, 0, 1, 1],
                    [0, 0, 1, 1],
                    [0, 0, 1, 1],
                    [0, 0, 1, 1]]:
-            return True, {self.x: 2*self.x - (1 - (-1)**self.x) / 2}, False
+            return True, {self.x: 2*self.x - (1 - I**(2*self.x)) / 2}, False
 
         elif m == [[1, 0, 0, 1],
                    [1, 0, 0, 1],
                    [1, 0, 0, 1],
                    [1, 0, 0, 1]]:
-            return True, {self.x: 2*self.x - (1 - (-1)**self.x) / 2 + 1}, False
+            return True, {self.x: 2*self.x - (1 - I**(2*self.x)) / 2 + 1}, False
 
         elif m == [[1, 1, 0, 0],
                    [1, 1, 0, 0],
                    [1, 1, 0, 0],
                    [1, 1, 0, 0]]:
-            return True, {self.x: 2*self.x - (1 - (-1)**self.x) / 2 + 2}, False
+            return True, {self.x: 2*self.x - (1 - I**(2*self.x)) / 2 + 2}, False
 
         elif m == [[0, 1, 1, 0],
                    [0, 1, 1, 0],
                    [0, 1, 1, 0],
                    [0, 1, 1, 0]]:
-            return True, {self.x: 2*self.x + (1 - (-1)**self.x) / 2}, False
+            return True, {self.x: 2*self.x + (1 - I**(2*self.x)) / 2}, False
 
         elif m == [[0, 0, 0, 0],
                    [0, 0, 0, 0],
                    [1, 1, 1, 1],
                    [1, 1, 1, 1]]:
-            return True, {self.y: 2*self.y - (1 - (-1)**self.y) / 2}, False
+            return True, {self.y: 2*self.y - (1 - I**(2*self.y)) / 2}, False
 
         elif m == [[1, 1, 1, 1],
                    [0, 0, 0, 0],
                    [0, 0, 0, 0],
                    [1, 1, 1, 1]]:
-            return True, {self.y: 2*self.y - (1 - (-1)**self.y) / 2 + 1}, False
+            return True, {self.y: 2*self.y - (1 - I**(2*self.y)) / 2 + 1}, False
 
         elif m == [[1, 1, 1, 1],
                    [1, 1, 1, 1],
                    [0, 0, 0, 0],
                    [0, 0, 0, 0]]:
-            return True, {self.y: 2*self.y - (1 - (-1)**self.y) / 2 + 2}, False
+            return True, {self.y: 2*self.y - (1 - I**(2*self.y)) / 2 + 2}, False
 
         elif m == [[0, 0, 0, 0],
                    [1, 1, 1, 1],
                    [1, 1, 1, 1],
                    [0, 0, 0, 0]]:
-            return True, {self.y: 2*self.y + (1 - (-1)**self.y) / 2}, False
+            return True, {self.y: 2*self.y + (1 - I**(2*self.y)) / 2}, False
+        # endregion
 
-        # match rotations
+        # region match experiment
+
+        if m == [[0, 1, 1, 0],
+                 [0, 1, 1, 0],
+                 [1, 0, 0, 1],
+                 [1, 0, 0, 1]]:
+            return False, {self.y: self.y + -I**(3*self.x)/2 + I**(3*self.x + 1)/2 - I**self.x/2 - I**(self.x + 1)/2 + 1}, False
+
+        # region match rotations
         elif m in [[[0, 0, 1, 1],
                     [0, 0, 1, 1],
                     [1, 1, 0, 0],
@@ -197,12 +223,6 @@ class Functor:
                     [1, 1, 0, 0],
                     [0, 0, 1, 1],
                     [0, 0, 1, 1]],
-
-                   [[0, 1, 1, 0],
-                    [0, 1, 1, 0],
-                    [1, 0, 0, 1],
-                    [1, 0, 0, 1]],
-
 
                    [[1, 0, 0, 1],
                     [0, 1, 1, 0],
@@ -249,8 +269,9 @@ class Functor:
                     [0, 1, 1, 0],
                     [1, 1, 0, 0]]]:
             return False, rotator, True
-
-        # match shifting
+        # endregion
+    
+        # region match shifting
         elif m in [[[1, 1, 0, 0],
                     [1, 0, 0, 1],
                     [1, 1, 0, 0],
@@ -260,7 +281,7 @@ class Functor:
                     [0, 1, 1, 0],
                     [0, 0, 1, 1],
                     [0, 1, 1, 0]]]:
-            return False, {self.x: self.x + (1 - (-1)**(self.y + 1)) / 2}, False
+            return False, {self.x: self.x + (1 - I**(2*self.y + 2)) / 2}, False
 
         elif m in [[[1, 1, 0, 0],
                     [0, 0, 1, 1],
@@ -281,7 +302,7 @@ class Functor:
                     [1, 0, 0, 1],
                     [0, 1, 1, 0],
                     [1, 0, 0, 1]]]:
-            return False, {self.x: self.x + 1 - (-1)**self.y}, False
+            return False, {self.x: self.x + 1 - I**(2*self.y)}, False
 
         elif m in [[[1, 1, 1, 1],
                     [1, 0, 1, 0],
@@ -302,7 +323,7 @@ class Functor:
                     [0, 0, 0, 0],
                     [0, 1, 0, 1],
                     [1, 1, 1, 1]]]:
-            return False, {self.y: self.y + (1 - (-1)**(self.x + 1)) / 2}, False
+            return False, {self.y: self.y + (1 - I**(2*self.x + 2)) / 2}, False
 
         elif m in [[[1, 1, 1, 1],
                     [0, 1, 0, 1],
@@ -323,7 +344,7 @@ class Functor:
                     [1, 1, 1, 1],
                     [0, 1, 0, 1],
                     [0, 0, 0, 0]]]:
-            return False, {self.y: self.y + (1 - (-1)**self.x) / 2}, False
+            return False, {self.y: self.y + (1 - I**(2*self.x)) / 2}, False
 
         elif m in [[[1, 0, 1, 0],
                     [0, 1, 0, 1],
@@ -349,7 +370,7 @@ class Functor:
                     [1, 0, 0, 1],
                     [0, 0, 1, 1],
                     [1, 0, 0, 1]]]:
-            return False, {self.x: self.x + (1 - (-1)**self.y) / 2}, False
+            return False, {self.x: self.x + (1 - I**(2*self.y)) / 2}, False
 
         elif m in [[[0, 1, 0, 1],
                     [0, 1, 0, 1],
@@ -370,7 +391,16 @@ class Functor:
                     [0, 1, 0, 1],
                     [0, 1, 0, 1],
                     [1, 0, 1, 0]]]:
-            return False, {self.y: self.y + 1 - (-1)**self.x}, False
+            return False, {self.y: self.y + 1 - I**(2*self.x)}, False
+        # endregion 
+
+        # region match complex shifting
+        elif m == [[1, 1, 1, 0],
+                   [1, 1, 1, 0],
+                   [0, 0, 0, 1],
+                   [0, 0, 0, 1]]:
+            return False, {self.y: self.y - I**self.x + I**(3*self.x + 1)/2 - I**(self.x + 1)/2 + Rational(3/2)}, False
+        # endregion
 
         else:
             raise BaseException("Invalid pattern")

@@ -1,10 +1,10 @@
-from sympy.core import symbols
+from sympy.core import symbols # type: ignore
 from functor import Functor
 from utils import matrix_print
 
 if __name__ == "__main__":
     # initialize everything
-    N = 313 * 11
+    N = 313 * 107
     # N = 313 * 107
     # N = 313 * 223
     # N = 91
@@ -14,7 +14,7 @@ if __name__ == "__main__":
     matchFailure = False
 
     # loop through the constructions
-    for i in range(19):
+    for i in range(4):
         # print some stats
         print("Iteration: " + str(i))
         print("Bits reduced: " + str(bits))
@@ -22,7 +22,6 @@ if __name__ == "__main__":
         fn.print()
         if bits >= len(bin(int(N**(1/2)))):
             break
-
 
         # perform the lift and record what happened
         try:

@@ -1,4 +1,4 @@
-from sympy.core import symbols # type: ignore
+from sympy import symbols, I, Rational # type: ignore
 from functor import Functor
 from utils import matrix_print
 
@@ -8,13 +8,14 @@ if __name__ == "__main__":
     # N = 313 * 107
     # N = 313 * 223
     # N = 91
-    fn = Functor(N)
-    bits = 0
+    x, y = symbols('x,y')
+    fn = Functor(I**(2*y)*x + I**(2*y)*y/2 + I**(2*y)/4 + 5*x**2 + 6*x*y + 2*x + y**2 + 2*y - Rational(2093/4))
+    bits = 6
     rotation = False
     matchFailure = False
 
     # loop through the constructions
-    for i in range(13):
+    for i in range(4):
         # print some stats
         print("Iteration: " + str(i))
         print("Bits reduced: " + str(bits))
@@ -41,7 +42,7 @@ if __name__ == "__main__":
         fn = Functor(function)
 
     print("Bits reduced: " + str(bits))
-    fn.print()
+    fn.print(print_full=True)
     matrix_print(fn.gen_matrix(m=8))
     if matchFailure == True:
         print("Failed to match.")

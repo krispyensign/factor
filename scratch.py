@@ -99,17 +99,62 @@ if __name__ == "__main__":
     print([[I**(I**(2*y) + 2*x + 4*y + 1).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
     print([[I**(2*x + 2*y + 2).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
     sep_print()
-    A = [[2, 2, 2, 0]]
-    print(A)
-    s = encode(Matrix(A)).expand().subs({
-        I * I**(3*x):           I**(3*x + 1),
-        I * I**(2*x):           I**(2*x + 1),
-        I * I**x:               I**(x + 1),
-        I**x * I**(2*x + 1):    I**(3*x + 1),
-    })
-    pprint(s)
-    print(s)
+    print([[I**(-2*I**(2*x)).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
     sep_print()
+    print([[I*I**(-I**(2*y)).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    print([[(I**(2*y)).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    sep_print()
+    print([[I*I**(-I**(2*y)).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    print([[(I**(2*y)).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    sep_print()
+    print([[I*I**(I**(2*y)).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    print([[(I**(2*y + 2)).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+
+
+    # A = [[2, 2, 2, 0]]
+    # print(A)
+    # s = encode(Matrix(A)).expand().subs({
+    #     I * I**(3*x):           I**(3*x + 1),
+    #     I * I**(2*x):           I**(2*x + 1),
+    #     I * I**x:               I**(x + 1),
+    #     I**x * I**(2*x + 1):    I**(3*x + 1),
+    # })
+    # pprint(s)
+    # print(s)
+    # sep_print()
+
+    # fntest = Functor((5*x**2 + 12*x*y + 10*x + 4*y**2 + 9*y - 519).subs({
+    #     x: x + y,
+    # }).subs({
+    #     x: 2*x + 1,
+    # }).expand() / 2)
+    # fntest.print()
+
+    # f1 = 5*I**(32*y)/32 + 3*I**(24*y)/8 - 3*I**(20*y)/4 + 10*x**2 + 48*x*y + 10*x + 32*y**2 + 21*y - Rational(2009/32)
+    # print(f1.subs({
+    #     I**(32*y): 1,
+    #     I**(24*y): 1,
+    #     I**(20*y): 1,
+    # }).expand())
+    # f2 = 5*I**(32*y)/32 + 3*I**(24*y)/8 + 3*I**(20*y)/4 + 10*x**2 + 48*x*y + 43*x + 32*y**2 + 81*y - Rational(809/32)
+    # print(f2.subs({
+    #     I**(32*y): 1,
+    #     I**(24*y): 1,
+    #     I**(20*y): 1,
+    # }).expand())
+    # f3 = 5*I**(32*y)/32 + 3*I**(24*y)/8 - 3*I**(20*y)/4 + 10*x**2 + 48*x*y + 33*x + 32*y**2 + 57*y - Rational(1369/32)
+    # print(f3.subs({
+    #     I**(32*y): 1,
+    #     I**(24*y): 1,
+    #     I**(20*y): 1,
+    # }).expand())
+    # f4 = 5*I**(32*y)/32 + 3*I**(24*y)/8 + 3*I**(20*y)/4 + 10*x**2 + 48*x*y + 44*x + 32*y**2 + 77*y - Rational(841/32)
+    # print(f4.subs({
+    #     I**(32*y): 1,
+    #     I**(24*y): 1,
+    #     I**(20*y): 1,
+    # }).expand())
+
     # a = symbols('a0, a1, a2, a3')
     # b = symbols('b0, b1, b2, b3')
     # c = symbols('c0, c1, c2, c3')

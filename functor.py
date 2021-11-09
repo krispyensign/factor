@@ -27,28 +27,38 @@ class Functor:
             self.f = z
             self.f = self.smooth()
 
-    def print(self) -> None:
+    def print(self, print_full = False) -> None:
         # print and pretty print the main function
         pprint(self.f)
         print(self.f)
 
-        # print the 4 sub functions
-        pprint(Functor(self.f.expand().subs({
-            self.x:         2*self.x,
-            self.y:         2*self.y,
-        }).expand()).f)
-        pprint(Functor(self.f.expand().subs({
-            self.x:         2*self.x + 1,
-            self.y:         2*self.y,
-        }).expand()).f)
-        pprint(Functor(self.f.expand().subs({
-            self.x:         2*self.x,
-            self.y:         2*self.y + 1,
-        }).expand()).f)
-        pprint(Functor(self.f.expand().subs({
-            self.x:         2*self.x + 1,
-            self.y:         2*self.y + 1,
-        }).expand()).f)
+        if print_full is False:
+            # print the 4 sub functions
+            print(Functor(self.f.expand().subs({
+                self.x:         2*self.x,
+            }).expand()).f)
+            print(Functor(self.f.expand().subs({
+                self.x:         2*self.x + 1,
+            }).expand()).f)
+        else:
+            # print the 4 sub functions
+            print(Functor(self.f.expand().subs({
+                self.x:         2*self.x,
+                self.y:         2*self.y,
+            }).expand()).f)
+            print(Functor(self.f.expand().subs({
+                self.x:         2*self.x + 1,
+                self.y:         2*self.y,
+            }).expand()).f)
+            print(Functor(self.f.expand().subs({
+                self.x:         2*self.x,
+                self.y:         2*self.y + 1,
+            }).expand()).f)
+            print(Functor(self.f.expand().subs({
+                self.x:         2*self.x + 1,
+                self.y:         2*self.y + 1,
+            }).expand()).f)
+
 
         # print the matrix
         matrix_print(self.gen_matrix())
@@ -79,62 +89,32 @@ class Functor:
 
     def smooth(self) -> Add:
         # replace complicated exponents with simpler isomorphic exponents over the integers
-        return (
-            self.f
-            .xreplace({
-                I**(4*self.x):      1,
-                I**(4*self.y):      1,
-                I**(8*self.x):      1,
-                I**(8*self.y):      1,
-                I**(12*self.x):      1,
-                I**(12*self.y):      1,
-                I**(16*self.x):      1,
-                I**(16*self.y):      1,
-                I**(8*self.x + 4):  1,
-                I**(8*self.y + 4):  1,
-                I**(4*self.x + 2):  -1,
-                I**(4*self.y + 2):  -1,
+        return self.f.expand().subs({
+            I**(4*self.x):              1,
+            I**(4*self.y):              1,
+            I**(8*self.x):              1,
+            I**(8*self.y):              1,
+            I**(12*self.x):             1,
+            I**(12*self.y):             1,
+            I**(16*self.x):             1,
+            I**(16*self.y):             1,
+            I**(8*self.x + 4):          1,
+            I**(8*self.y + 4):          1,
+            I**(4*self.x + 2):          -1,
+            I**(4*self.y + 2):          -1,
 
-                I**(I**(2*self.x) + 4*self.x + 3):
-                I**(2*self.x),
-                
-                I**(I**(2*self.y) + 4*self.y + 3):
-                I**(2*self.y),
+            I**(6*self.y):              I**(2*self.y),
+            I**(6*self.x):              I**(2*self.x),
 
-                I**(I**(2*self.x) + 4*self.x + 1):
-                I**(2*self.x + 2),
+            I**(-2*I**(2*self.x)):      -1,
+            I**(-2*I**(2*self.y)):      -1,
 
-                -I**(-2*I**(2*self.x) + 2*self.y + 2):
-                I**(2*self.y + 2),
-                
-                I**(-I**(2*self.y) + 4*self.y + 3):
-                I**(2*self.y + 2),
-                
-                I**(-I**(3*self.x) - I**self.x + I**(self.x + 1) - I**(3*self.x + 1) + 2*self.y + 4):
-                I**(2*self.y + 2),
+            I*I**(-I**(2*self.x)):      I**(2*self.x),
+            I*I**(-I**(2*self.y)):      I**(2*self.y),
 
-                I**(-I**(3*self.x) - I**self.x + I**(self.x + 1) - I**(3*self.x + 1) + 2*self.y + 2):
-                I**(2*self.y),
-
-                I**(-I**(2*self.y + 2) + 2*self.x + 2*self.y + 1):
-                I**(2*self.x + 2),
-                
-                I**(I**(2*self.y) + 2*self.x + 4*self.y - 1):
-                I**(2*self.x + 2*self.y),
-                
-                I**(I**(2*self.x) + 2*self.y + 4*self.x - 1):
-                I**(2*self.x + 2*self.y),
-                
-                I**(I**(2*self.y) + 2*self.x + 4*self.y + 1):
-                I**(2*self.x + 2*self.y + 2),
-                
-                I**(I**(2*self.x) + 2*self.y + 4*self.x + 1):
-                I**(2*self.x + 2*self.y + 2),
-
-                I**(-I**(2*self.x) + 4*self.x + 3):
-                I**(2*self.x + 2),
-            })
-        )
+            I*I**(I**(2*self.x)):             I**(2*self.x + 2),
+            I*I**(I**(2*self.y)):             I**(2*self.y + 2),
+        })
 
     def matcher(
         self,

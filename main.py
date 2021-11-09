@@ -14,7 +14,7 @@ if __name__ == "__main__":
     matchFailure = False
 
     # loop through the constructions
-    for i in range(4):
+    for i in range(13):
         # print some stats
         print("Iteration: " + str(i))
         print("Bits reduced: " + str(bits))

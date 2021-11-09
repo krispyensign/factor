@@ -19,14 +19,13 @@ def encode(A: Matrix) -> Add | Mul:
     x: Symbol
     x = symbols('x')
     # setup walsh functions
-    ii = (-1)**x
+    ii = I**(2*x)
     kk = I**(3*x) / 2 - I**(3*x + 1) / 2 + I**x / 2 + I**(x + 1) / 2
     jj = kk.subs({x: x + 3}).subs({
         I**(x + 4):  I**x,
         I**(3*x + 9):  I**(3*x + 1),
         I**(3*x + 10): I**(3*x + 2),
     })
-    print(jj)
 
     # perform hadamard transform
     Ident: Matrix = Matrix([
@@ -66,10 +65,51 @@ if __name__ == "__main__":
     })
     pprint(s)
     print(s)
+    sep_print()
 
-    print([(I**(-2*I**(2*x))).subs({x: i}) for i in range(4)])
-    print([(I**(-I**(2*x))).subs({x: i}) for i in range(4)])
-    print([(I**(-I**(x))).subs({x: i}) for i in range(4)])
+
+    print([(-I**(-2*I**(4*x))).subs({x: i}) for i in range(4)])
+    print([(-I**(-2*I**(2*x))).subs({x: i}) for i in range(4)])
+
+    print([[(-I**(-2*I**(2*x) + 2*y + 2)).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    print([[(I**(2*y + 2)).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+
+    print([[I**(-I**(2*y) + 4*y + 3).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    print([[(I**(2*y + 2)).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+
+    sep_print()
+    print([[I**(-I**(3*x) - I**x + I**(x + 1) - I**(3*x + 1) + 2*y + 4).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    print([[I**(-I**(3*x) - I**x + I**(x + 1) - I**(3*x + 1) + 2*y + 2).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    sep_print()
+    print([[I**(-I**(2*y + 2) + 2*x + 2*y + 1).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    print([[I**(2*x + 2).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    sep_print()
+    print([[I**(-I**(2*x) + 4*x + 3).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    print([[I**(2*x + 2).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    sep_print()
+    print([[I**(I**(2*x) + 4*x + 3).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    print([[I**(2*x).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    sep_print()
+    print([[I**(I**(2*x) + 4*x + 1).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    print([[I**(2*x + 2).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    sep_print()
+    print([[I**(I**(2*y) + 2*x + 4*y - 1).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    print([[I**(2*x + 2*y).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    sep_print()
+    print([[I**(I**(2*y) + 2*x + 4*y + 1).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    print([[I**(2*x + 2*y + 2).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    sep_print()
+    A = [[2, 2, 2, 0]]
+    print(A)
+    s = encode(Matrix(A)).expand().subs({
+        I * I**(3*x):           I**(3*x + 1),
+        I * I**(2*x):           I**(2*x + 1),
+        I * I**x:               I**(x + 1),
+        I**x * I**(2*x + 1):    I**(3*x + 1),
+    })
+    pprint(s)
+    print(s)
+    sep_print()
     # a = symbols('a0, a1, a2, a3')
     # b = symbols('b0, b1, b2, b3')
     # c = symbols('c0, c1, c2, c3')

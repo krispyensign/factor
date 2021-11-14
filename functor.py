@@ -34,14 +34,22 @@ class Functor:
 
         if print_full is False:
             # print the 4 sub functions
+            print("==Full==")
             print(Functor(self.f.expand().subs({
                 self.x:         2*self.x,
             }).expand()).f)
             print(Functor(self.f.expand().subs({
                 self.x:         2*self.x + 1,
             }).expand()).f)
+            print(Functor(self.f.expand().subs({
+                self.y:         2*self.y,
+            }).expand()).f)
+            print(Functor(self.f.expand().subs({
+                self.y:         2*self.y + 1,
+            }).expand()).f)
         else:
             # print the 4 sub functions
+            print("==Half==")
             print(Functor(self.f.expand().subs({
                 self.x:         2*self.x,
                 self.y:         2*self.y,
@@ -278,7 +286,12 @@ class Functor:
         # endregion
     
         # region match shifting
-        elif m in [[[1, 1, 0, 0],
+        elif m in [[[0, 1, 1, 0],
+                    [1, 1, 0, 0],
+                    [0, 1, 1, 0],
+                    [1, 1, 0, 0]],
+
+                   [[1, 1, 0, 0],
                     [1, 0, 0, 1],
                     [1, 1, 0, 0],
                     [1, 0, 0, 1]],
@@ -399,6 +412,13 @@ class Functor:
                     [1, 0, 1, 0]]]:
             return False, {self.y: self.y + 1 - I**(2*self.x)}, False
         # endregion 
+
+        # region match experimental shifting
+        if m == [[0, 1, 1, 0],
+                 [1, 1, 0, 0],
+                 [0, 0, 1, 1],
+                 [0, 1, 1, 0]]:
+            return False, {self.x: self.x + 3*I**(3*self.y)/4 - I**(2*self.y)/2 - I**(3*self.y + 1)/4 + 3*I**self.y/4 + I**(self.y + 1)/4 + 2}, False
 
         else:
             raise BaseException("Invalid pattern")

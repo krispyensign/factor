@@ -9,13 +9,13 @@ if __name__ == "__main__":
     # N = 313 * 223
     # N = 91
     x, y = symbols('x,y')
-    fn = Functor(I**(2*y)*x + I**(2*y)*y/2 + I**(2*y)/4 + 5*x**2 + 6*x*y + 2*x + y**2 + 2*y - Rational(2093/4))
-    bits = 6
+    fn = Functor(x**2 - y**2 - N)
+    bits = 0
     rotation = False
     matchFailure = False
 
     # loop through the constructions
-    for i in range(4):
+    for i in range(16):
         # print some stats
         print("Iteration: " + str(i))
         print("Bits reduced: " + str(bits))

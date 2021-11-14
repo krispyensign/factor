@@ -1,5 +1,5 @@
 from math import fmod
-from functor import Functor
+from typing import Tuple
 from sympy import (   # type: ignore
     symbols,
     Symbol,
@@ -11,34 +11,9 @@ from sympy import (   # type: ignore
     Rational,
 )
 
-from typing import Tuple
-
+from functor import Functor
+from core import core, build_shift_any, encode
 from utils import matrix_print, sep_print
-
-def encode(A: Matrix) -> Add | Mul:
-    x: Symbol
-    x = symbols('x')
-    # setup walsh functions
-    ii = I**(2*x)
-    kk = I**(3*x) / 2 - I**(3*x + 1) / 2 + I**x / 2 + I**(x + 1) / 2
-    jj = kk.subs({x: x + 3}).subs({
-        I**(x + 4):  I**x,
-        I**(3*x + 9):  I**(3*x + 1),
-        I**(3*x + 10): I**(3*x + 2),
-    })
-
-    # perform hadamard transform
-    Ident: Matrix = Matrix([
-        [1,  1,  1,  1],
-        [1, -1,  1, -1],
-        [1,  1, -1, -1],
-        [1, -1, -1,  1],
-    ])
-
-    B: Matrix = (A * Ident)
-    
-    # convert to function
-    return (B[0] + B[1]*ii + B[2]*jj + B[3]*kk) / 4
 
 if __name__ == "__main__":
     x: Symbol
@@ -57,7 +32,7 @@ if __name__ == "__main__":
     f = -(-1)**x*(-1)**y*x/4 - (-1)**x*x/4 + (-1)**x*y/2 - (-1)**x/8 + 3*(-1)**y*x/4 + (-1)**y*y/2 + (-1)**y/4 + 5*x**2/4 + 3*x*y + 5*x/4 + y**2 + 3*y/2 - Rational(4185/8)
     fn = Functor(f)
     # 2 2 2 4
-    s = encode(Matrix([[0, 2, 2, 0]])).expand().subs({
+    s = encode(Matrix([[3, 2, 0, 3]]), x).expand().subs({
         I * I**(3*x):           I**(3*x + 1),
         I * I**(2*x):           I**(2*x + 1),
         I * I**x:               I**(x + 1),
@@ -68,60 +43,70 @@ if __name__ == "__main__":
     sep_print()
 
 
-    print([(-I**(-2*I**(4*x))).subs({x: i}) for i in range(4)])
-    print([(-I**(-2*I**(2*x))).subs({x: i}) for i in range(4)])
+    # print([(-I**(-2*I**(4*x))).subs({x: i}) for i in range(4)])
+    # print([(-I**(-2*I**(2*x))).subs({x: i}) for i in range(4)])
 
-    print([[(-I**(-2*I**(2*x) + 2*y + 2)).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
-    print([[(I**(2*y + 2)).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    # print([[(-I**(-2*I**(2*x) + 2*y + 2)).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    # print([[(I**(2*y + 2)).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
 
-    print([[I**(-I**(2*y) + 4*y + 3).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
-    print([[(I**(2*y + 2)).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    # print([[I**(-I**(2*y) + 4*y + 3).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    # print([[(I**(2*y + 2)).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
 
-    sep_print()
-    print([[I**(-I**(3*x) - I**x + I**(x + 1) - I**(3*x + 1) + 2*y + 4).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
-    print([[I**(-I**(3*x) - I**x + I**(x + 1) - I**(3*x + 1) + 2*y + 2).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
-    sep_print()
-    print([[I**(-I**(2*y + 2) + 2*x + 2*y + 1).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
-    print([[I**(2*x + 2).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
-    sep_print()
-    print([[I**(-I**(2*x) + 4*x + 3).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
-    print([[I**(2*x + 2).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
-    sep_print()
-    print([[I**(I**(2*x) + 4*x + 3).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
-    print([[I**(2*x).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
-    sep_print()
-    print([[I**(I**(2*x) + 4*x + 1).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
-    print([[I**(2*x + 2).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
-    sep_print()
-    print([[I**(I**(2*y) + 2*x + 4*y - 1).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
-    print([[I**(2*x + 2*y).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
-    sep_print()
-    print([[I**(I**(2*y) + 2*x + 4*y + 1).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
-    print([[I**(2*x + 2*y + 2).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
-    sep_print()
-    print([[I**(-2*I**(2*x)).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
-    sep_print()
-    print([[I*I**(-I**(2*y)).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
-    print([[(I**(2*y)).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
-    sep_print()
-    print([[I*I**(-I**(2*y)).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
-    print([[(I**(2*y)).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
-    sep_print()
-    print([[I*I**(I**(2*y)).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
-    print([[(I**(2*y + 2)).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
-
-
-    # A = [[2, 2, 2, 0]]
-    # print(A)
-    # s = encode(Matrix(A)).expand().subs({
-    #     I * I**(3*x):           I**(3*x + 1),
-    #     I * I**(2*x):           I**(2*x + 1),
-    #     I * I**x:               I**(x + 1),
-    #     I**x * I**(2*x + 1):    I**(3*x + 1),
-    # })
-    # pprint(s)
-    # print(s)
     # sep_print()
+    # print([[I**(-I**(3*x) - I**x + I**(x + 1) - I**(3*x + 1) + 2*y + 4).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    # print([[I**(-I**(3*x) - I**x + I**(x + 1) - I**(3*x + 1) + 2*y + 2).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    # sep_print()
+    # print([[I**(-I**(2*y + 2) + 2*x + 2*y + 1).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    # print([[I**(2*x + 2).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    # sep_print()
+    # print([[I**(-I**(2*x) + 4*x + 3).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    # print([[I**(2*x + 2).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    # sep_print()
+    # print([[I**(I**(2*x) + 4*x + 3).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    # print([[I**(2*x).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    # sep_print()
+    # print([[I**(I**(2*x) + 4*x + 1).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    # print([[I**(2*x + 2).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    # sep_print()
+    # print([[I**(I**(2*y) + 2*x + 4*y - 1).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    # print([[I**(2*x + 2*y).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    # sep_print()
+    # print([[I**(I**(2*y) + 2*x + 4*y + 1).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    # print([[I**(2*x + 2*y + 2).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    # sep_print()
+    # print([[I**(-2*I**(2*x)).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    # sep_print()
+    # print([[I*I**(-I**(2*y)).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    # print([[(I**(2*y)).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    # sep_print()
+    # print([[I*I**(-I**(2*y)).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    # print([[(I**(2*y)).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    # sep_print()
+    # print([[I*I**(I**(2*y)).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    # print([[(I**(2*y + 2)).subs({x: i, y: j}) for i in range(4)] for j in range(4)])
+    
+    f = I**(2*x)*I**(2*y)/8 - I**(2*x)*x/2 - I**(2*x)*y/4 - 3*I**(2*x)/8 - I**(2*y)*x/2 - I**(2*y)*y - 3*I**(2*y)/4 + x**2 + x*y + 3*x/2 - 3*y**2/4 - y/4 - 523
+    g = f.subs({
+        x: 
+        x + 3*I**(3*y)/4 - I**(2*y)/2 - I**(3*y + 1)/4 + 3*I**y/4 + I**(y + 1)/4 + 2,
+        
+    }).xreplace({
+        I**(x + 3*I**(3*y)/4 - I**(2*y)/2 - I**(3*y + 1)/4 + 3*I**y/4 + I**(y + 1)/4 + 2):
+        I**x*(-I**(3*x)/2 + I**(2*x)/2 - I**(3*x + 1)/2 - I/2),
+    })
+    pprint(g)
+
+    A = [[I**(3*I**(3*y)/4 - I**(2*y)/2 - I**(3*y + 1)/4 + 3*I**y/4 + I**(y + 1)/4 + 2).subs(y, i) for i in range(4)]]
+    print(A)
+    s = encode(Matrix(A)).expand().subs({
+        I * I**(3*x):           I**(3*x + 1),
+        I * I**(2*x):           I**(2*x + 1),
+        I * I**x:               I**(x + 1),
+        I**x * I**(2*x + 1):    I**(3*x + 1),
+    })
+    pprint(s)
+    print(s)
+    sep_print()
 
     # fntest = Functor((5*x**2 + 12*x*y + 10*x + 4*y**2 + 9*y - 519).subs({
     #     x: x + y,
@@ -160,16 +145,6 @@ if __name__ == "__main__":
     # c = symbols('c0, c1, c2, c3')
     # d = symbols('d0, d1, d2, d3')
     # fn = encode(Matrix([[a[0], a[1], a[2], a[3]]]))
-    # fn0 = Rational(1/4) * fn.subs({
-    #     a[0]: 2,
-    #     a[1]: 2,
-    #     a[2]: 2,
-    #     a[3]: 0,
-    # })
-    # pprint(fn0)
-    # print(fn0)
-    # pprint(fn)
-    # sep_print()
 
     # fn2 = fn.subs({
     #     a[0] + a[1] + a[2] + a[3]:  b[0],

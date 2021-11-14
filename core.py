@@ -6,7 +6,7 @@ def core() -> Add:
     x: Symbol
     y: Symbol
     x, y = symbols('x, y')
-    n: list[Symbol] = symbols(','.join([f"n{i}" for i in range(12)]))
+    n: list[Symbol] = symbols(','.join([f"n{i}" for i in range(15)]))
     a: list[Symbol] = symbols(','.join([f"a{i}" for i in range(12)]))
     b: list[Symbol] = symbols(','.join([f"b{i}" for i in range(12)]))
 
@@ -41,24 +41,11 @@ def encode(A: Matrix, w: Symbol) -> Add | Mul:
     )
 
 
-def build_shift_any(f: Add, is_x: bool = True) -> Add:
-    w: Symbol
-    v: Symbol
-    if is_x is True:
-        w = symbols('x')
-        v = symbols('y')
-    else:
-        w = symbols('y')
-        v = symbols('x')
-
+def build_shift_any(f: Add, w: Symbol) -> Add:
     c: list[Symbol] = symbols('c0, c1, c2, c3')
     d: list[Symbol] = symbols('d0, d1, d2, d3')
-    e: list[Symbol] = symbols('e0, e1, e2, e3')
-    g: list[Symbol] = symbols('g0, g1, g2, g3')
 
-    fn = encode(Matrix([[c[0], c[1], c[2], c[3]]]), w)
-
-    fn2 = fn.subs({
+    return encode(Matrix([[c[0], c[1], c[2], c[3]]]), w).subs({
         c[0] + c[1] + c[2] + c[3]:  d[0],
     }).xreplace({
         c[0] - c[1] + c[2] - c[3]:  d[1],
@@ -67,3 +54,33 @@ def build_shift_any(f: Add, is_x: bool = True) -> Add:
     }).xreplace({
         c[0] - c[1] - c[2] + c[3]:  d[3],
     }).expand()
+
+
+def core_shift_smooth(f: Add, w: Symbol, v: Symbol, shift: Add):
+    a: list[Symbol] = symbols(','.join([f"a{i}" for i in range(12)]))
+
+    q: Symbol = symbols('q')
+    g = f.subs({w: w + q}).expand()
+
+    t1 = I*(a[0]*q)
+    t2 = I*(a[1]*q)
+    t3 = I*(a[4]*q)
+    t4 = I*(a[5]*q)
+    t5 = I*(a[8]*q)
+    t6 = I*(a[9]*q)
+
+    u1 = encode(Matrix([[I*(a[0]*shift.subs({v: i})) for i in range(4)]]), v)
+    u2 = encode(Matrix([[I*(a[1]*shift.subs({v: i})) for i in range(4)]]), v)
+    u3 = encode(Matrix([[I*(a[4]*shift.subs({v: i})) for i in range(4)]]), v)
+    u4 = encode(Matrix([[I*(a[5]*shift.subs({v: i})) for i in range(4)]]), v)
+    u5 = encode(Matrix([[I*(a[8]*shift.subs({v: i})) for i in range(4)]]), v)
+    u6 = encode(Matrix([[I*(a[9]*shift.subs({v: i})) for i in range(4)]]), v)
+
+    return g.xreplace({
+        t1: u1,
+        t2: u2,
+        t3: u3,
+        t4: u4,
+        t5: u5,
+        t6: u6,
+    })

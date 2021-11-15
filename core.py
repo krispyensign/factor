@@ -62,19 +62,19 @@ def core_shift_smooth(f: Add, w: Symbol, v: Symbol, shift: Add):
     q: Symbol = symbols('q')
     g = f.subs({w: w + q}).expand()
 
-    t1 = I*(a[0]*q)
-    t2 = I*(a[1]*q)
-    t3 = I*(a[4]*q)
-    t4 = I*(a[5]*q)
-    t5 = I*(a[8]*q)
-    t6 = I*(a[9]*q)
+    t1 = I**(a[0]*q)
+    t2 = I**(a[1]*q)
+    t3 = I**(a[4]*q)
+    t4 = I**(a[5]*q)
+    t5 = I**(a[8]*q)
+    t6 = I**(a[9]*q)
 
-    u1 = encode(Matrix([[I*(a[0]*shift.subs({v: i})) for i in range(4)]]), v)
-    u2 = encode(Matrix([[I*(a[1]*shift.subs({v: i})) for i in range(4)]]), v)
-    u3 = encode(Matrix([[I*(a[4]*shift.subs({v: i})) for i in range(4)]]), v)
-    u4 = encode(Matrix([[I*(a[5]*shift.subs({v: i})) for i in range(4)]]), v)
-    u5 = encode(Matrix([[I*(a[8]*shift.subs({v: i})) for i in range(4)]]), v)
-    u6 = encode(Matrix([[I*(a[9]*shift.subs({v: i})) for i in range(4)]]), v)
+    u1 = encode(Matrix([[I**(a[0]*shift.subs({v: i})) for i in range(4)]]), v)
+    u2 = encode(Matrix([[I**(a[1]*shift.subs({v: i})) for i in range(4)]]), v)
+    u3 = encode(Matrix([[I**(a[4]*shift.subs({v: i})) for i in range(4)]]), v)
+    u4 = encode(Matrix([[I**(a[5]*shift.subs({v: i})) for i in range(4)]]), v)
+    u5 = encode(Matrix([[I**(a[8]*shift.subs({v: i})) for i in range(4)]]), v)
+    u6 = encode(Matrix([[I**(a[9]*shift.subs({v: i})) for i in range(4)]]), v)
 
     return g.xreplace({
         t1: u1,

@@ -46,18 +46,18 @@ def build_shift_any(f: Add, w: Symbol) -> Add:
     d: list[Symbol] = symbols('d0, d1, d2, d3')
 
     return encode(Matrix([[c[0], c[1], c[2], c[3]]]), w).subs({
-        c[0] + c[1] + c[2] + c[3]:  d[0],
-    }).xreplace({
+        c[0]/4 + c[1]/4 + c[2]/4 + c[3]/4:  d[0]/4,
         c[0] - c[1] + c[2] - c[3]:  d[1],
-    }).xreplace({
         c[0] + c[1] - c[2] - c[3]:  d[2],
-    }).xreplace({
         c[0] - c[1] - c[2] + c[3]:  d[3],
-    }).expand()
+    })
 
 
 def core_shift_smooth(f: Add, w: Symbol, v: Symbol, shift: Add):
-    a: list[Symbol] = symbols(','.join([f"a{i}" for i in range(12)]))
+    a: list[Symbol] = symbols(','.join([f"a{i}" for i in range(15)]))
+    c: list[Symbol] = symbols('c0, c1, c2, c3')
+    d: list[Symbol] = symbols('d0, d1, d2, d3')
+    e: list[Symbol] = symbols(','.join([f"a{i}" for i in range(15)]))
 
     q: Symbol = symbols('q')
     g = f.subs({w: w + q}).expand()
@@ -83,4 +83,5 @@ def core_shift_smooth(f: Add, w: Symbol, v: Symbol, shift: Add):
         t4: u4,
         t5: u5,
         t6: u6,
+        q: shift,
     })

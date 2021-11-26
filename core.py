@@ -3,6 +3,10 @@ from sympy import Symbol, symbols, I, Matrix, Add, Mul, Rational  # type: ignore
 # define some global symbols
 x: Symbol
 y: Symbol
+i: Symbol
+j: Symbol
+k: Symbol
+
 x, y = symbols('x, y')
 i, j, k = symbols('i, j, k')
 n: list[Symbol] = symbols(','.join([f"n{ii}" for ii in range(29)]))
@@ -13,7 +17,25 @@ d: list[Symbol] = symbols('d0, d1, d2, d3')
 e: list[Symbol] = symbols('e0, e1, e2, e3')
 
 
-def core() -> Add:
+def transform(A: Matrix, w: Symbol) -> Add | Mul:
+    # perform hadamard transform
+    B: Matrix = (A * Matrix([
+        [1,  1,  1,  1],
+        [1, -1,  1, -1],
+        [1,  1, -1, -1],
+        [1, -1, -1,  1],
+    ]))
+
+    # convert to function
+    return Rational(1/4)*(
+        B[0] +
+        B[1]*i**w +
+        B[2]*j**w +
+        B[3]*k**w
+    )
+
+
+def create_generalized_polynomial() -> Add:
     # define the core function
     return (
         n[0]*x**2 +
@@ -70,26 +92,8 @@ def core() -> Add:
     )
 
 
-def encode(A: Matrix, w: Symbol) -> Add | Mul:
-    # perform hadamard transform
-    B: Matrix = (A * Matrix([
-        [1,  1,  1,  1],
-        [1, -1,  1, -1],
-        [1,  1, -1, -1],
-        [1, -1, -1,  1],
-    ]))
-
-    # convert to function
-    return Rational(1/4)*(
-        B[0] +
-        B[1]*i**w +
-        B[2]*j**w +
-        B[3]*k**w
-    )
-
-
-def build_shift_any(f: Add, w: Symbol) -> Add:
-    return encode(Matrix([[c[0], c[1], c[2], c[3]]]), w).subs({
+def create_generalized_shift(w: Symbol) -> Add:
+    return transform(Matrix([[c[0], c[1], c[2], c[3]]]), w).subs({
         c[0]/4 + c[1]/4 + c[2]/4 + c[3]/4:  d[0]/4,
         c[0] - c[1] + c[2] - c[3]:  d[1],
         c[0] + c[1] - c[2] - c[3]:  d[2],
@@ -97,8 +101,8 @@ def build_shift_any(f: Add, w: Symbol) -> Add:
     })
 
 
-def encode_smooth(r: Symbol, shift: Add, v: Symbol, base: Symbol) -> Add:
-    return encode(Matrix([[base**(r*shift.subs({v: ii})) for ii in range(4)]]), v).subs({
+def smooth(f: Add) -> Add:
+    return f.subs({
         # smooth powers to reduce climbing powers and for better grouping
         i**2: 1,
         j**2: -1,
@@ -118,75 +122,6 @@ def encode_smooth(r: Symbol, shift: Add, v: Symbol, base: Symbol) -> Add:
         d[0]/4 + d[1]/4 - d[2]/4 - d[3]/4: e[2],
         d[0]/4 - d[1]/4 - d[2]/4 + d[3]/4: e[3],
         d[0]/4 + i*d[1]/4 + d[2]/4 + i*d[3]/4: e[1],
-    })
-
-
-def core_shift_smooth(f: Add, w: Symbol, v: Symbol, shift: Add):
-    # define a local temp symbol
-    q: Symbol = symbols('q')
-
-    # introduce q
-    g: Add = f.subs({w: w + q}).expand()
-
-    # encode everything to reduce climbing powers
-    for ii in range(18):
-        # encode and smooth
-        u = encode_smooth(a[ii], shift, v, i)
-
-        # substitute
-        g = g.xreplace({
-            i**(a[ii]*q): u
-        }).expand()
-
-        # encode and smooth
-        u = encode_smooth(a[ii], shift, v, j)
-
-        # substitute
-        g = g.xreplace({
-            j**(a[ii]*q): u
-        }).expand()
-
-        # encode and smooth
-        u = encode_smooth(a[ii], shift, v, k)
-
-        # substitute
-        g = g.xreplace({
-            k**(a[ii]*q): u
-        }).expand()
-
-        # encode and smooth
-        u = encode_smooth(b[ii], shift, v, i)
-
-        # substitute
-        g = g.xreplace({
-            i**(b[ii]*q): u
-        }).expand()
-
-        # encode and smooth
-        u = encode_smooth(b[ii], shift, v, j)
-
-        # substitute
-        g = g.xreplace({
-            j**(b[ii]*q): u
-        }).expand()
-
-        # encode and smooth
-        u = encode_smooth(b[ii], shift, v, k)
-
-        # substitute
-        g = g.xreplace({
-            k**(b[ii]*q): u
-        }).expand()
-
-    return g.subs({
-        q: shift,
-    }).xreplace({
-        # group values and introduce e[n]
-        d[0]/4 + d[1]/4 + d[2]/4 + d[3]/4: e[0],
-        d[0]/4 - d[1]/4 + d[2]/4 - d[3]/4: e[1],
-        d[0]/4 + d[1]/4 - d[2]/4 - d[3]/4: e[2],
-        d[0]/4 - d[1]/4 - d[2]/4 + d[3]/4: e[3],
-        d[0]/4 + i*d[1]/4 + d[2]/4 + i*d[3]/4: e[1],
     }).expand().subs({
         # smooth more powers
         i**(2*y): 1,
@@ -196,3 +131,34 @@ def core_shift_smooth(f: Add, w: Symbol, v: Symbol, shift: Add):
         k**(2*x): i**x,
         k**(2*y): i**y,
     })
+
+
+def encode(r: Symbol, shift: Add, v: Symbol, base: Symbol) -> Add:
+    return smooth(
+        transform(
+            Matrix([[base**(r*shift.subs({v: ii})) for ii in range(4)]]),
+            v))
+
+
+def shift_polynomial(f: Add, w: Symbol, v: Symbol, shift: Add) -> Add:
+    # define a local temp symbol
+    q: Symbol = symbols('q')
+
+    # introduce q
+    g: Add = f.subs({w: w + q}).expand()
+
+    # encode everything to reduce to simpler form
+    for ii in range(18):
+        # substitute with encoding
+        g = g.xreplace({
+            i**(a[ii]*q): encode(a[ii], shift, v, i),
+            j**(a[ii]*q): encode(a[ii], shift, v, j),
+            k**(a[ii]*q): encode(a[ii], shift, v, k),
+            i**(b[ii]*q): encode(b[ii], shift, v, i),
+            j**(b[ii]*q): encode(b[ii], shift, v, j),
+            k**(b[ii]*q): encode(b[ii], shift, v, k),
+        }).expand()
+
+    return smooth(g.subs({
+        q: shift,
+    }))

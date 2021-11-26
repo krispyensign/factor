@@ -13,7 +13,7 @@ from sympy import (   # type: ignore
 )
 
 from functor import Functor
-from core import core, build_shift_any, core_shift_smooth, encode
+from core import create_generalized_polynomial, create_generalized_shift, shift_polynomial 
 from utils import matrix_print, sep_print
 
 if __name__ == "__main__":
@@ -21,9 +21,9 @@ if __name__ == "__main__":
     d: list[Symbol] = symbols('d0, d1, d2, d3')
     e: list[Symbol] = symbols('e0, e1, e2, e3')
 
-    f = core()
-    shift = build_shift_any(f, y)
-    g = core_shift_smooth(f, x, y, shift)*16
+    f = create_generalized_polynomial()
+    shift = create_generalized_shift(y)
+    g = shift_polynomial(f, x, y, shift)*16
     # sep_print()
     # pprint(shift)
     pprint(g)

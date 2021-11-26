@@ -1,65 +1,58 @@
 import unittest
 
-from sympy import pprint  # type: nolint
+from sympy import pprint, Integer  # type: nolint
 from core import *
-
-
-def hadamard_evaluate(f: Add) -> Add:
-    return f.xreplace({
-        i**3: -1,
-        j**3: -1,
-        k**3: 1,
-
-        i**2: 1,
-        j**2: -1,
-        k**2: -1,
-
-        i: -1,
-        j: 1,
-        k: -1,
-    })
-
-
-def condense_terms(f: Add) -> Add:
-    return f.xreplace({
-        d[0]/4 + d[1]/4 + d[2]/4 + d[3]/4: e[0],
-        d[0]/4 - d[1]/4 + d[2]/4 - d[3]/4: e[1],
-        d[0]/4 + d[1]/4 - d[2]/4 - d[3]/4: e[2],
-        d[0]/4 - d[1]/4 - d[2]/4 + d[3]/4: e[3],
-    })
 
 
 class TestTransforms(unittest.TestCase):
     def test_prove_transform(self):
-        source = Matrix([[c[ii] for ii in range(4)]])
-        target = Matrix([[c[ii] for ii in range(4)]])
+        # prove transform
+        source = transform(Matrix([[c[ii] for ii in range(4)]]), x)
 
-        encoded_source = transform(source, x)
-
-        evaluated = Matrix([[hadamard_evaluate(encoded_source.subs({
+        # evaluate 0 .. 4 for all cases
+        evaluated = Matrix([[hadamard_evaluate(source.subs({
             x: ii,
         }).expand()) for ii in range(4)]])
 
+        # provide expected result
+        target = Matrix([[c[ii] for ii in range(4)]])
+
         self.assertTrue(evaluated.equals(target))
 
-    def test_prove_i_powers_reduce(self):
+    def test_prove_condense_terms(self):
+        # provide function to be reduced
         f: Add = i**create_generalized_shift(x)
 
-        source = Matrix([[condense_terms(hadamard_evaluate(f.subs({
+        # prove condensed terms of a function before a transform still gives original values
+        source = transform(Matrix([[condense_terms(hadamard_evaluate(f.subs({
             x: ii
-        })).subs({
-            (-1): i,
+        }))) for ii in range(4)]]), x)
+
+        # evaluate 0 .. 4 for all cases
+        evaluated = Matrix([[hadamard_evaluate(source.subs({
+            x: ii,
+        }).expand()) for ii in range(4)]])
+
+        # provide expected results for all cases
+        target = Matrix([[(-1)**e[ii] for ii in range(4)]])
+
+        self.assertTrue(evaluated.equals(target))
+
+    def test_prove_encode(self):
+        # prove encoded function is equivalent to manually evaluating function with a power
+        source = encode(a[0], create_generalized_shift(x), x, i)
+
+        # evaluate 0 .. 4 for all cases
+        evaluated = Matrix([[hadamard_evaluate(source.subs({
+            x: ii,
         })) for ii in range(4)]])
 
-        target = Matrix([[i**e[ii] for ii in range(4)]])
-
-        encoded_source = transform(source, x)
-
-        evaluated = Matrix([[hadamard_evaluate(encoded_source.subs({
-            x: ii,
-        }).expand()).subs({
-            (-1): i,
-        }) for ii in range(4)]])
+        # provide expected results 0 .. 4 for all cases with no encoding
+        target = Matrix([[condense_terms(hadamard_evaluate((i**(a[0]*x)).subs({
+            x: create_generalized_shift(x)
+        }).subs({
+            x: ii
+        }))) for ii in range(4)]])
 
         self.assertTrue(evaluated.equals(target))
 

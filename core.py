@@ -17,6 +17,50 @@ d: list[Symbol] = symbols('d0, d1, d2, d3')
 e: list[Symbol] = symbols('e0, e1, e2, e3')
 
 
+def hadamard_evaluate(f: Add) -> Add:
+    return f.xreplace({
+        i**3: -1,
+        j**3: -1,
+        k**3: 1,
+
+        i**2: 1,
+        j**2: -1,
+        k**2: -1,
+
+        i: -1,
+        j: 1,
+        k: -1,
+    })
+
+def condense_terms_no_eval(f: Add) -> Add:
+    return f.xreplace({
+        d[0]/4 + d[1]/4 + d[2]/4 + d[3]/4: e[0],
+        d[0]/4 + i*d[1]/4 + j*d[2]/4 + k*d[3]/4: e[1],
+        d[0]/4 + i**2*d[1]/4 + j**2*d[2]/4 + k**2*d[3]/4: e[2],
+        d[0]/4 + i**3*d[1]/4 + j**3*d[2]/4 + k**3*d[3]/4: e[3],
+    })
+
+
+def condense_terms(f: Add) -> Add:
+    return f.xreplace({
+        d[0]/4 + d[1]/4 + d[2]/4 + d[3]/4: e[0],
+        d[0]/4 - d[1]/4 + d[2]/4 - d[3]/4: e[1],
+        d[0]/4 + d[1]/4 - d[2]/4 - d[3]/4: e[2],
+        d[0]/4 - d[1]/4 - d[2]/4 + d[3]/4: e[3],
+    })
+
+def power_reduction(f: Add) -> Add:
+    return f.expand().subs({
+        # smooth more powers
+        i**(2*y): 1,
+        i**(2*x): 1,
+        j**(2*x): i**x,
+        j**(2*y): i**y,
+        k**(2*x): i**x,
+        k**(2*y): i**y,
+    })
+
+
 def transform(A: Matrix, w: Symbol) -> Add | Mul:
     # perform hadamard transform
     B: Matrix = (A * Matrix([
@@ -122,23 +166,15 @@ def smooth(f: Add) -> Add:
         d[0]/4 + d[1]/4 - d[2]/4 - d[3]/4: e[2],
         d[0]/4 - d[1]/4 - d[2]/4 + d[3]/4: e[3],
         d[0]/4 + i*d[1]/4 + d[2]/4 + i*d[3]/4: e[1],
-    }).expand().subs({
-        # smooth more powers
-        i**(2*y): 1,
-        i**(2*x): 1,
-        j**(2*x): i**x,
-        j**(2*y): i**y,
-        k**(2*x): i**x,
-        k**(2*y): i**y,
     })
 
 
-def encode(r: Symbol, shift: Add, v: Symbol, base: Symbol) -> Add:
-    return smooth(
+def encode(coeff: Symbol, shift: Add, v: Symbol, base: Symbol) -> Add:
+    return condense_terms_no_eval(
         transform(
-            Matrix([[base**(r*shift.subs({v: ii})) for ii in range(4)]]),
-            v))
-
+            Matrix([[base**(coeff*shift.subs({v: ii})) for ii in range(4)]])
+            , v
+    ))
 
 def shift_polynomial(f: Add, w: Symbol, v: Symbol, shift: Add) -> Add:
     # define a local temp symbol

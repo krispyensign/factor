@@ -3,6 +3,7 @@ import unittest
 from sympy import pprint  # type: nolint
 from core import *
 
+
 def hadamard_evaluate(f: Add) -> Add:
     return f.xreplace({
         i**3: -1,
@@ -18,6 +19,7 @@ def hadamard_evaluate(f: Add) -> Add:
         k: -1,
     })
 
+
 def condense_terms(f: Add) -> Add:
     return f.xreplace({
         d[0]/4 + d[1]/4 + d[2]/4 + d[3]/4: e[0],
@@ -25,6 +27,7 @@ def condense_terms(f: Add) -> Add:
         d[0]/4 + d[1]/4 - d[2]/4 - d[3]/4: e[2],
         d[0]/4 - d[1]/4 - d[2]/4 + d[3]/4: e[3],
     })
+
 
 class TestTransforms(unittest.TestCase):
     def test_prove_transform(self):
@@ -59,7 +62,6 @@ class TestTransforms(unittest.TestCase):
         }) for ii in range(4)]])
 
         self.assertTrue(evaluated.equals(target))
-
 
 
 if __name__ == '__main__':

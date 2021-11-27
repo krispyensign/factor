@@ -1,4 +1,4 @@
-from sympy import Symbol, symbols, I, Matrix, Add, Mul, Rational  # type: ignore
+from sympy import Symbol, symbols, I, Matrix, Add, Mul, Rational, pprint  # type: ignore
 
 # define some global symbols
 x: Symbol
@@ -30,7 +30,7 @@ def hadamard_evaluate(f: Add) -> Add:
         i**5: -1,
         j**5: 1,
         k**5: -1,
-        
+
         i**4: 1,
         j**4: 1,
         k**4: 1,
@@ -48,6 +48,7 @@ def hadamard_evaluate(f: Add) -> Add:
         k: -1,
     })
 
+
 def condense_terms_no_eval(f: Add) -> Add:
     return f.xreplace({
         d[0]/4 + d[1]/4 + d[2]/4 + d[3]/4: e[0],
@@ -58,12 +59,22 @@ def condense_terms_no_eval(f: Add) -> Add:
 
 
 def condense_terms(f: Add) -> Add:
-    return f.xreplace({
+    return f.subs({
         d[0]/4 + d[1]/4 + d[2]/4 + d[3]/4: e[0],
         d[0]/4 - d[1]/4 + d[2]/4 - d[3]/4: e[1],
         d[0]/4 + d[1]/4 - d[2]/4 - d[3]/4: e[2],
         d[0]/4 - d[1]/4 - d[2]/4 + d[3]/4: e[3],
     })
+
+
+def condense_terms_c(f: Add) -> Add:
+    return f.subs({
+        c[0] + c[1] + c[2] + c[3]: d[0],
+        c[0] - c[1] + c[2] - c[3]: d[1],
+        c[0] + c[1] - c[2] - c[3]: d[2],
+        c[0] - c[1] - c[2] + c[3]: d[3],
+    })
+
 
 def power_reduction(f: Add) -> Add:
     return f.expand().subs({
@@ -153,19 +164,14 @@ def create_generalized_polynomial() -> Add:
 
 
 def create_generalized_shift(w: Symbol) -> Add:
-    return (transform(Matrix([[c[0], c[1], c[2], c[3]]]), w)*4).subs({
-        c[0] + c[1] + c[2] + c[3]:  d[0],
-        c[0] - c[1] + c[2] - c[3]:  d[1],
-        c[0] + c[1] - c[2] - c[3]:  d[2],
-        c[0] - c[1] - c[2] + c[3]:  d[3],
-    })/4
+    return condense_terms_c(transform(Matrix([[c[ii] for ii in range(4)]]), w)*4)/4
 
 
 def encode(coeff: Symbol, shift: Add, v: Symbol, base: Symbol) -> Add:
     return condense_terms_no_eval(
         transform(
-            Matrix([[base**(coeff*shift.subs({v: ii})) for ii in range(4)]])
-            , v))
+            Matrix([[base**(coeff*shift.subs({v: ii})) for ii in range(4)]]), v))
+
 
 def shift_polynomial(f: Add, w: Symbol, v: Symbol, shift: Add) -> Add:
     # define a local temp symbol

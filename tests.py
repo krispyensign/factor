@@ -1,6 +1,6 @@
 import unittest
 
-from sympy import pprint, Integer  # type: nolint
+from sympy import pprint, Integer  # type: ignore
 from core import *
 
 

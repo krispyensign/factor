@@ -2,11 +2,30 @@ import unittest
 
 from sympy import pprint, Integer  # type: ignore
 from core import *
+from utils import sep_print
 
 
 class TestTransforms(unittest.TestCase):
+    def test_prove_power_reduction_i(self):
+        # prove that i**(2*x) == 1
+        source = Matrix(([[hadamard_evaluate(i**(2*x).subs({x: ii})) for ii in range(4)]]))
+        target = Matrix(([[1 for ii in range(4)]]))
+        self.assertTrue(source.equals(target))
+
+    def test_prove_power_reduction_j(self):        
+        # prove that j**(2*x) == i**x
+        source = Matrix(([[hadamard_evaluate(j**(2*x).subs({x: ii})) for ii in range(4)]]))
+        target = Matrix(([[hadamard_evaluate((i**x).subs({x: ii})) for ii in range(4)]]))
+        self.assertTrue(source.equals(target))
+    
+    def test_prove_power_reduction_k(self):        
+        # prove that k**(2*x) == i**x
+        source = Matrix(([[hadamard_evaluate(k**(2*x).subs({x: ii})) for ii in range(4)]]))
+        target = Matrix(([[hadamard_evaluate((i**x).subs({x: ii})) for ii in range(4)]]))
+        self.assertTrue(source.equals(target))
+
     def test_prove_transform(self):
-        # prove transform
+        # prove the transform
         source = transform(Matrix([[c[ii] for ii in range(4)]]), x)
 
         # evaluate 0 .. 4 for all cases
@@ -16,9 +35,8 @@ class TestTransforms(unittest.TestCase):
 
         # provide expected result
         target = Matrix([[c[ii] for ii in range(4)]])
-
         self.assertTrue(evaluated.equals(target))
-
+    
     def test_prove_condense_terms(self):
         # provide function to be reduced
         f: Add = i**create_generalized_shift(x)

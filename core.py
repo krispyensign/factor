@@ -19,6 +19,22 @@ e: list[Symbol] = symbols('e0, e1, e2, e3')
 
 def hadamard_evaluate(f: Add) -> Add:
     return f.xreplace({
+        i**7: -1,
+        j**7: -1,
+        k**7: 1,
+
+        i**6: 1,
+        j**6: -1,
+        k**6: -1,
+
+        i**5: -1,
+        j**5: 1,
+        k**5: -1,
+        
+        i**4: 1,
+        j**4: 1,
+        k**4: 1,
+
         i**3: -1,
         j**3: -1,
         k**3: 1,
@@ -137,44 +153,19 @@ def create_generalized_polynomial() -> Add:
 
 
 def create_generalized_shift(w: Symbol) -> Add:
-    return transform(Matrix([[c[0], c[1], c[2], c[3]]]), w).subs({
-        c[0]/4 + c[1]/4 + c[2]/4 + c[3]/4:  d[0]/4,
+    return (transform(Matrix([[c[0], c[1], c[2], c[3]]]), w)*4).subs({
+        c[0] + c[1] + c[2] + c[3]:  d[0],
         c[0] - c[1] + c[2] - c[3]:  d[1],
         c[0] + c[1] - c[2] - c[3]:  d[2],
         c[0] - c[1] - c[2] + c[3]:  d[3],
-    })
-
-
-def smooth(f: Add) -> Add:
-    return f.subs({
-        # smooth powers to reduce climbing powers and for better grouping
-        i**2: 1,
-        j**2: -1,
-        k**2: -1,
-
-        i**3: -1,
-        j**3: -1,
-        k**3: 1,
-
-        i: i,
-        j: 1,
-        k: i,
-    }).xreplace({
-        # group values and introduce e[n]
-        d[0]/4 + d[1]/4 + d[2]/4 + d[3]/4: e[0],
-        d[0]/4 - d[1]/4 + d[2]/4 - d[3]/4: e[1],
-        d[0]/4 + d[1]/4 - d[2]/4 - d[3]/4: e[2],
-        d[0]/4 - d[1]/4 - d[2]/4 + d[3]/4: e[3],
-        d[0]/4 + i*d[1]/4 + d[2]/4 + i*d[3]/4: e[1],
-    })
+    })/4
 
 
 def encode(coeff: Symbol, shift: Add, v: Symbol, base: Symbol) -> Add:
     return condense_terms_no_eval(
         transform(
             Matrix([[base**(coeff*shift.subs({v: ii})) for ii in range(4)]])
-            , v
-    ))
+            , v))
 
 def shift_polynomial(f: Add, w: Symbol, v: Symbol, shift: Add) -> Add:
     # define a local temp symbol
@@ -193,8 +184,8 @@ def shift_polynomial(f: Add, w: Symbol, v: Symbol, shift: Add) -> Add:
             i**(b[ii]*q): encode(b[ii], shift, v, i),
             j**(b[ii]*q): encode(b[ii], shift, v, j),
             k**(b[ii]*q): encode(b[ii], shift, v, k),
-        }).expand()
+        })
 
-    return smooth(g.subs({
+    return power_reduction(g.subs({
         q: shift,
-    }))
+    }).expand())

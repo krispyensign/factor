@@ -167,7 +167,10 @@ def create_generalized_shift(v: Symbol) -> Add:
 
 
 def encode(coeff: Symbol, shift: Add, v: Symbol, walsh: Function) -> Add:
-    return condense_terms_d(hadamard_transform(Matrix([[walsh(coeff*shift.subs({v: ii})) for ii in range(4)]]), v))
+    return condense_terms_d(
+        hadamard_transform(
+            Matrix([[walsh(coeff*shift.subs({v: ii})) for ii in range(4)]]), v)
+    )
 
 
 def shift_polynomial(f: Add, v: Symbol, w: Symbol, shift: Add) -> Add:

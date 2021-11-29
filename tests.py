@@ -52,7 +52,7 @@ class TestTransforms(unittest.TestCase):
         }).expand()) for ii in range(4)]])
 
         # provide expected results for all cases
-        target = Matrix([[i(e[ii]/4) for ii in range(4)]])
+        target = condense_terms_d(Matrix([[i(f.subs({x: ii})) for ii in range(4)]]))
 
         self.assertTrue(evaluated.equals(target))
 

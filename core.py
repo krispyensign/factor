@@ -13,7 +13,7 @@ from sympy import (  # type: ignore
 class i(Function):
     """Walsh[1] function"""
     @classmethod
-    def eval(cls, n):
+    def eval(cls, n) -> int | Function:
         if n.is_Integer:
             match Mod(n, 4):
                 case 0: return 1
@@ -25,7 +25,7 @@ class i(Function):
 class j(Function):
     """Walsh[2] function"""
     @classmethod
-    def eval(cls, n):
+    def eval(cls, n) -> int | Function:
         if n.is_Integer:
             match Mod(n, 4):
                 case 0: return 1
@@ -37,7 +37,7 @@ class j(Function):
 class k(Function):
     """Walsh[3] function"""
     @classmethod
-    def eval(cls, n):
+    def eval(cls, n) -> int | Function:
         if n.is_Integer:
             match Mod(n, 4):
                 case 0: return 1
@@ -59,10 +59,10 @@ e: list[Symbol] = symbols('e0, e1, e2, e3')
 
 def condense_terms_d(f: Add) -> Add:
     return f.subs({
-        d[0]/4 + d[1]/4 + d[2]/4 + d[3]/4: e[0],
-        d[0]/4 - d[1]/4 + d[2]/4 - d[3]/4: e[1],
-        d[0]/4 + d[1]/4 - d[2]/4 - d[3]/4: e[2],
-        d[0]/4 - d[1]/4 - d[2]/4 + d[3]/4: e[3],
+        d[0]/4 + d[1]/4 + d[2]/4 + d[3]/4: e[0]/4,
+        d[0]/4 - d[1]/4 + d[2]/4 - d[3]/4: e[1]/4,
+        d[0]/4 + d[1]/4 - d[2]/4 - d[3]/4: e[2]/4,
+        d[0]/4 - d[1]/4 - d[2]/4 + d[3]/4: e[3]/4,
     })
 
 
@@ -174,20 +174,18 @@ def shift_polynomial(f: Add, v: Symbol, w: Symbol, shift: Add) -> Add:
     # define a local temp symbol
     q: Symbol = symbols('q')
 
-    # introduce q
+    # introduce q to be incrementally substituted with shift
     g: Add = f.subs({v: v + q}).expand()
 
     # encode everything to reduce to simpler form
-    for ii in range(18):
-        # substitute with encoding
-        g = g.xreplace({
-            i(a[ii]*q): encode(a[ii], shift, w, i),
-            j(a[ii]*q): encode(a[ii], shift, w, j),
-            k(a[ii]*q): encode(a[ii], shift, w, k),
-            i(b[ii]*q): encode(b[ii], shift, w, i),
-            j(b[ii]*q): encode(b[ii], shift, w, j),
-            k(b[ii]*q): encode(b[ii], shift, w, k),
-        })
+    for s in [a, b]:
+        for ii in range(18):
+            # substitute with encoding
+            g = g.xreplace({
+                i(s[ii]*q): encode(s[ii], shift, w, i),
+                j(s[ii]*q): encode(s[ii], shift, w, j),
+                k(s[ii]*q): encode(s[ii], shift, w, k),
+            })
 
     return walsh_reduction(g.subs({
         q: shift,

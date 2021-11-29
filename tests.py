@@ -52,12 +52,12 @@ class TestTransforms(unittest.TestCase):
         }).expand()) for ii in range(4)]])
 
         # provide expected results for all cases
-        target = Matrix([[i(e[ii]) for ii in range(4)]])
+        target = Matrix([[i(e[ii]/4) for ii in range(4)]])
 
         self.assertTrue(evaluated.equals(target))
 
     def test_prove_encode(self):
-        # prove encoded function is equivalent to manually evaluating function with a power
+        # prove encoded function is equivalent to unencoded function
         source = encode(a[0], create_generalized_shift(x), x, i)
 
         # evaluate 0 .. 4 for all cases

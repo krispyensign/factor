@@ -8,6 +8,7 @@ from sympy import (  # type: ignore
     Function,
     Mod,
     Expr,
+    pprint,
 )
 
 
@@ -21,6 +22,9 @@ class i(Function):
                 case 1: return -1
                 case 2: return 1
                 case 3: return -1
+        if n.is_Add:
+            h, t = n.as_two_terms()
+            return i(h)*i(t)
 
 
 class j(Function):
@@ -33,6 +37,9 @@ class j(Function):
                 case 1: return 1
                 case 2: return -1
                 case 3: return -1
+        if n.is_Add:
+            h, t = n.as_two_terms()
+            return j(h)*j(t)
 
 
 class k(Function):
@@ -45,6 +52,9 @@ class k(Function):
                 case 1: return -1
                 case 2: return -1
                 case 3: return 1
+        if n.is_Add:
+            h, t = n.as_two_terms()
+            return k(h)*k(t)
 
 
 # define some global symbols
@@ -60,10 +70,10 @@ e: list[Symbol] = symbols('e0, e1, e2, e3')
 
 def condense_terms_d(f: Add) -> Add:
     return f.subs({
-        d[0]/4 + d[1]/4 + d[2]/4 + d[3]/4: e[0]/4,
-        d[0]/4 - d[1]/4 + d[2]/4 - d[3]/4: e[1]/4,
-        d[0]/4 + d[1]/4 - d[2]/4 - d[3]/4: e[2]/4,
-        d[0]/4 - d[1]/4 - d[2]/4 + d[3]/4: e[3]/4,
+        d[0]/4 + d[1]/4 + d[2]/4 + d[3]/4: e[0],
+        d[0]/4 - d[1]/4 + d[2]/4 - d[3]/4: e[1],
+        d[0]/4 + d[1]/4 - d[2]/4 - d[3]/4: e[2],
+        d[0]/4 - d[1]/4 - d[2]/4 + d[3]/4: e[3],
     })
 
 
@@ -79,6 +89,12 @@ def condense_terms_c(f: Add) -> Add:
 def walsh_reduction(f: Add) -> Add:
     # perform reduction of walsh function args
     return f.expand().subs({
+        i(y)**2: 1,
+        i(x)**2: 1,
+        j(x)**2: i(x),
+        j(y)**2: i(y),
+        k(x)**2: i(x),
+        k(y)**2: i(y),
         i(2*y): 1,
         i(2*x): 1,
         j(2*x): i(x),

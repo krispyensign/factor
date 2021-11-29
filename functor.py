@@ -1,4 +1,4 @@
-from sympy import ( # type: ignore
+from sympy import (  # type: ignore
     Mod,
     symbols,
     pprint,
@@ -27,7 +27,7 @@ class Functor:
             self.f = z
             self.f = self.smooth()
 
-    def print(self, print_full = False) -> None:
+    def print(self, print_full=False) -> None:
         # print and pretty print the main function
         pprint(self.f)
         print(self.f)
@@ -66,7 +66,6 @@ class Functor:
                 self.x:         2*self.x + 1,
                 self.y:         2*self.y + 1,
             }).expand()).f)
-
 
         # print the matrix
         matrix_print(self.gen_matrix())
@@ -108,14 +107,14 @@ class Functor:
             I**(16*self.y):             1,
             I**(8*self.x + 4):          1,
             I**(8*self.y + 4):          1,
-            I**(4*self.x + 2):          -1,
-            I**(4*self.y + 2):          -1,
+            I**(4*self.x + 2): -1,
+            I**(4*self.y + 2): -1,
 
             I**(6*self.y):              I**(2*self.y),
             I**(6*self.x):              I**(2*self.x),
 
-            I**(-2*I**(2*self.x)):      -1,
-            I**(-2*I**(2*self.y)):      -1,
+            I**(-2*I**(2*self.x)): -1,
+            I**(-2*I**(2*self.y)): -1,
 
             I*I**(-I**(2*self.x)):      I**(2*self.x),
             I*I**(-I**(2*self.y)):      I**(2*self.y),
@@ -217,8 +216,7 @@ class Functor:
         # endregion
 
         # region match rotations
-        elif m in [
-                   [[0, 1, 1, 0],
+        elif m in [[[0, 1, 1, 0],
                     [0, 1, 1, 0],
                     [1, 0, 0, 1],
                     [1, 0, 0, 1]],
@@ -284,7 +282,7 @@ class Functor:
                     [1, 1, 0, 0]]]:
             return False, rotator, True
         # endregion
-    
+
         # region match shifting
         elif m in [[[0, 1, 1, 0],
                     [1, 1, 0, 0],
@@ -411,7 +409,7 @@ class Functor:
                     [0, 1, 0, 1],
                     [1, 0, 1, 0]]]:
             return False, {self.y: self.y + 1 - I**(2*self.x)}, False
-        # endregion 
+        # endregion
 
         # region match experimental shifting
         if m == [[0, 1, 1, 0],

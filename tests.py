@@ -1,9 +1,6 @@
 import unittest
 
-from sympy import pprint, Integer  # type: ignore
 from core import *
-from utils import sep_print
-
 
 class TestTransforms(unittest.TestCase):
     def test_prove_walsh_reduction_i(self):

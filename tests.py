@@ -26,9 +26,7 @@ class TestTransforms(unittest.TestCase):
         source = hadamard_transform(Matrix([[c[ii] for ii in range(4)]]), x)
 
         # evaluate 0 .. 4 for all cases
-        evaluated = Matrix([[(source.subs({
-            x: ii,
-        }).expand()) for ii in range(4)]])
+        evaluated = Matrix([[(source.subs({x: ii}).expand()) for ii in range(4)]])
 
         # provide expected result
         target = Matrix([[c[ii] for ii in range(4)]])
@@ -44,9 +42,7 @@ class TestTransforms(unittest.TestCase):
         })))) for ii in range(4)]]), x)
 
         # evaluate 0 .. 4 for all cases
-        evaluated = Matrix([[(source.subs({
-            x: ii,
-        }).expand()) for ii in range(4)]])
+        evaluated = Matrix([[(source.subs({x: ii}).expand()) for ii in range(4)]])
 
         # provide expected results for all cases
         target = condense_terms_d(Matrix([[i(f.subs({x: ii})) for ii in range(4)]]))
@@ -58,15 +54,13 @@ class TestTransforms(unittest.TestCase):
         source = encode(a[0], create_generalized_shift(x), x, i)
 
         # evaluate 0 .. 4 for all cases
-        evaluated = Matrix([[(source.subs({
-            x: ii,
-        })) for ii in range(4)]])
+        evaluated = Matrix([[(source.subs({x: ii,})) for ii in range(4)]])
 
         # provide expected results 0 .. 4 for all cases with no encoding
         target = Matrix([[condense_terms_d(((i(a[0]*x)).subs({
-            x: create_generalized_shift(x)
+            x: create_generalized_shift(x),
         }).subs({
-            x: ii
+            x: ii,
         }))) for ii in range(4)]])
 
         self.assertTrue(evaluated.equals(target))

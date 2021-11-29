@@ -6,14 +6,15 @@ from sympy import (  # type: ignore
     Mul,
     Rational,
     Function,
-    Mod
+    Mod,
+    Expr,
 )
 
 
 class i(Function):
     """Walsh[1] function"""
     @classmethod
-    def eval(cls, n) -> int | Function:
+    def eval(cls, n: int | Expr) -> int | Function:
         if n.is_Integer:
             match Mod(n, 4):
                 case 0: return 1
@@ -25,7 +26,7 @@ class i(Function):
 class j(Function):
     """Walsh[2] function"""
     @classmethod
-    def eval(cls, n) -> int | Function:
+    def eval(cls, n: int | Expr) -> int | Function:
         if n.is_Integer:
             match Mod(n, 4):
                 case 0: return 1
@@ -37,7 +38,7 @@ class j(Function):
 class k(Function):
     """Walsh[3] function"""
     @classmethod
-    def eval(cls, n) -> int | Function:
+    def eval(cls, n: int | Expr) -> int | Function:
         if n.is_Integer:
             match Mod(n, 4):
                 case 0: return 1

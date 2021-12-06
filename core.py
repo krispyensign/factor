@@ -1,14 +1,65 @@
-from sympy import Symbol, symbols, I, Matrix, Add, Mul, Rational, pprint  # type: ignore
+from sympy import (  # type: ignore
+    Symbol,
+    symbols,
+    Matrix,
+    Add,
+    Mul,
+    Rational,
+    Function,
+    Mod,
+    Expr,
+    pprint,
+)
+
+
+class i(Function):
+    """Walsh[1] function"""
+    @classmethod
+    def eval(cls, n: int | Expr) -> int | Function:
+        if n.is_Integer:
+            match Mod(n, 4):
+                case 0: return 1
+                case 1: return -1
+                case 2: return 1
+                case 3: return -1
+        if n.is_Add:
+            h, t = n.as_two_terms()
+            return i(h)*i(t)
+
+
+class j(Function):
+    """Walsh[2] function"""
+    @classmethod
+    def eval(cls, n: int | Expr) -> int | Function:
+        if n.is_Integer:
+            match Mod(n, 4):
+                case 0: return 1
+                case 1: return 1
+                case 2: return -1
+                case 3: return -1
+        if n.is_Add:
+            h, t = n.as_two_terms()
+            return j(h)*j(t)
+
+
+class k(Function):
+    """Walsh[3] function"""
+    @classmethod
+    def eval(cls, n: int | Expr) -> int | Function:
+        if n.is_Integer:
+            match Mod(n, 4):
+                case 0: return 1
+                case 1: return -1
+                case 2: return -1
+                case 3: return 1
+        if n.is_Add:
+            h, t = n.as_two_terms()
+            return k(h)*k(t)
+
 
 # define some global symbols
-x: Symbol
-y: Symbol
-i: Symbol
-j: Symbol
-k: Symbol
-
-x, y = symbols('x, y')
-i, j, k = symbols('i, j, k')
+x: Symbol = symbols('x')
+y: Symbol = symbols('y')
 n: list[Symbol] = symbols(','.join([f"n{ii}" for ii in range(29)]))
 a: list[Symbol] = symbols(','.join([f"a{ii}" for ii in range(18)]))
 b: list[Symbol] = symbols(','.join([f"b{ii}" for ii in range(18)]))
@@ -17,48 +68,7 @@ d: list[Symbol] = symbols('d0, d1, d2, d3')
 e: list[Symbol] = symbols('e0, e1, e2, e3')
 
 
-def hadamard_evaluate(f: Add) -> Add:
-    return f.xreplace({
-        i**7: -1,
-        j**7: -1,
-        k**7: 1,
-
-        i**6: 1,
-        j**6: -1,
-        k**6: -1,
-
-        i**5: -1,
-        j**5: 1,
-        k**5: -1,
-
-        i**4: 1,
-        j**4: 1,
-        k**4: 1,
-
-        i**3: -1,
-        j**3: -1,
-        k**3: 1,
-
-        i**2: 1,
-        j**2: -1,
-        k**2: -1,
-
-        i: -1,
-        j: 1,
-        k: -1,
-    })
-
-
-def condense_terms_no_eval(f: Add) -> Add:
-    return f.xreplace({
-        d[0]/4 + d[1]/4 + d[2]/4 + d[3]/4: e[0],
-        d[0]/4 + i*d[1]/4 + j*d[2]/4 + k*d[3]/4: e[1],
-        d[0]/4 + i**2*d[1]/4 + j**2*d[2]/4 + k**2*d[3]/4: e[2],
-        d[0]/4 + i**3*d[1]/4 + j**3*d[2]/4 + k**3*d[3]/4: e[3],
-    })
-
-
-def condense_terms(f: Add) -> Add:
+def condense_terms_d(f: Add) -> Add:
     return f.subs({
         d[0]/4 + d[1]/4 + d[2]/4 + d[3]/4: e[0],
         d[0]/4 - d[1]/4 + d[2]/4 - d[3]/4: e[1],
@@ -76,19 +86,25 @@ def condense_terms_c(f: Add) -> Add:
     })
 
 
-def power_reduction(f: Add) -> Add:
+def walsh_reduction(f: Add) -> Add:
+    # perform reduction of walsh function args
     return f.expand().subs({
-        # smooth more powers
-        i**(2*y): 1,
-        i**(2*x): 1,
-        j**(2*x): i**x,
-        j**(2*y): i**y,
-        k**(2*x): i**x,
-        k**(2*y): i**y,
+        i(y)**2: 1,
+        i(x)**2: 1,
+        j(x)**2: i(x),
+        j(y)**2: i(y),
+        k(x)**2: i(x),
+        k(y)**2: i(y),
+        i(2*y): 1,
+        i(2*x): 1,
+        j(2*x): i(x),
+        j(2*y): i(y),
+        k(2*x): i(x),
+        k(2*y): i(y),
     })
 
 
-def transform(A: Matrix, w: Symbol) -> Add | Mul:
+def hadamard_transform(A: Matrix, v: Symbol) -> Add | Mul:
     # perform hadamard transform
     B: Matrix = (A * Matrix([
         [1,  1,  1,  1],
@@ -100,9 +116,9 @@ def transform(A: Matrix, w: Symbol) -> Add | Mul:
     # convert to function
     return Rational(1/4)*(
         B[0] +
-        B[1]*i**w +
-        B[2]*j**w +
-        B[3]*k**w
+        B[1]*i(v) +
+        B[2]*j(v) +
+        B[3]*k(v)
     )
 
 
@@ -116,82 +132,81 @@ def create_generalized_polynomial() -> Add:
         x*(
             n[3] +
 
-            n[4]*i**(a[0]*x) +
-            n[5]*i**(b[0]*y) +
-            n[6]*i**(a[1]*x + b[1]*y) +
+            n[4]*i(a[0]*x) +
+            n[5]*i(b[0]*y) +
+            n[6]*i(a[1]*x + b[1]*y) +
 
-            n[6]*j**(a[2]*x) +
-            n[7]*j**(b[2]*y) +
-            n[8]*j**(a[3]*x + b[3]*y) +
+            n[6]*j(a[2]*x) +
+            n[7]*j(b[2]*y) +
+            n[8]*j(a[3]*x + b[3]*y) +
 
-            n[6]*k**(a[4]*x) +
-            n[7]*k**(b[4]*y) +
-            n[8]*k**(a[5]*x + b[5]*y)
+            n[6]*k(a[4]*x) +
+            n[7]*k(b[4]*y) +
+            n[8]*k(a[5]*x + b[5]*y)
         ) +
 
         y*(
             n[9] +
 
-            n[10]*i**(a[6]*x) +
-            n[11]*i**(b[6]*y) +
-            n[12]*i**(a[7]*x + b[7]*y) +
+            n[10]*i(a[6]*x) +
+            n[11]*i(b[6]*y) +
+            n[12]*i(a[7]*x + b[7]*y) +
 
-            n[13]*j**(a[8]*x) +
-            n[14]*j**(b[8]*y) +
-            n[15]*j**(a[9]*x + b[9]*y) +
+            n[13]*j(a[8]*x) +
+            n[14]*j(b[8]*y) +
+            n[15]*j(a[9]*x + b[9]*y) +
 
-            n[16]*k**(a[10]*x) +
-            n[17]*k**(b[10]*y) +
-            n[18]*k**(a[11]*x + b[11]*y)
+            n[16]*k(a[10]*x) +
+            n[17]*k(b[10]*y) +
+            n[18]*k(a[11]*x + b[11]*y)
         ) +
 
         (
             n[19] +
 
-            n[20]*i**(a[12]*x) +
-            n[21]*i**(b[12]*y) +
-            n[22]*i**(a[13]*x + b[13]*y) +
+            n[20]*i(a[12]*x) +
+            n[21]*i(b[12]*y) +
+            n[22]*i(a[13]*x + b[13]*y) +
 
-            n[23]*j**(a[14]*x) +
-            n[24]*j**(b[14]*y) +
-            n[25]*j**(a[15]*x + b[15]*y) +
+            n[23]*j(a[14]*x) +
+            n[24]*j(b[14]*y) +
+            n[25]*j(a[15]*x + b[15]*y) +
 
-            n[26]*k**(a[16]*x) +
-            n[27]*k**(b[16]*y) +
-            n[28]*k**(a[17]*x + b[17]*y)
+            n[26]*k(a[16]*x) +
+            n[27]*k(b[16]*y) +
+            n[28]*k(a[17]*x + b[17]*y)
         )
     )
 
 
-def create_generalized_shift(w: Symbol) -> Add:
-    return condense_terms_c(transform(Matrix([[c[ii] for ii in range(4)]]), w)*4)/4
+def create_generalized_shift(v: Symbol) -> Add:
+    return condense_terms_c(hadamard_transform(Matrix([[c[ii] for ii in range(4)]]), v)*4)/4
 
 
-def encode(coeff: Symbol, shift: Add, v: Symbol, base: Symbol) -> Add:
-    return condense_terms_no_eval(
-        transform(
-            Matrix([[base**(coeff*shift.subs({v: ii})) for ii in range(4)]]), v))
+def encode(coeff: Symbol, shift: Add, v: Symbol, walsh: Function) -> Add:
+    return condense_terms_d(
+        hadamard_transform(
+            Matrix([[walsh(coeff*shift.subs({v: ii})) for ii in range(4)]]), v)
+    )
 
 
-def shift_polynomial(f: Add, w: Symbol, v: Symbol, shift: Add) -> Add:
+def shift_polynomial(f: Add, v: Symbol, w: Symbol, shift: Add) -> Add:
     # define a local temp symbol
     q: Symbol = symbols('q')
 
-    # introduce q
-    g: Add = f.subs({w: w + q}).expand()
+    # introduce q to be incrementally substituted with shift
+    g: Add = f.subs({v: v + q}).expand()
 
     # encode everything to reduce to simpler form
-    for ii in range(18):
-        # substitute with encoding
-        g = g.xreplace({
-            i**(a[ii]*q): encode(a[ii], shift, v, i),
-            j**(a[ii]*q): encode(a[ii], shift, v, j),
-            k**(a[ii]*q): encode(a[ii], shift, v, k),
-            i**(b[ii]*q): encode(b[ii], shift, v, i),
-            j**(b[ii]*q): encode(b[ii], shift, v, j),
-            k**(b[ii]*q): encode(b[ii], shift, v, k),
-        })
+    for s in [a, b]:
+        for ii in range(18):
+            # substitute with encoding
+            g = g.xreplace({
+                i(s[ii]*q): encode(s[ii], shift, w, i),
+                j(s[ii]*q): encode(s[ii], shift, w, j),
+                k(s[ii]*q): encode(s[ii], shift, w, k),
+            })
 
-    return power_reduction(g.subs({
+    return walsh_reduction(g.subs({
         q: shift,
     }).expand())

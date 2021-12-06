@@ -24,7 +24,4 @@ if __name__ == "__main__":
     f = create_generalized_polynomial()
     shift = create_generalized_shift(y)
     g = shift_polynomial(f, x, y, shift)*16
-    # sep_print()
-    # pprint(shift)
     pprint(g)
-    sep_print()

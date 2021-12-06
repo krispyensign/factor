@@ -41,7 +41,7 @@ Proof.
 	reflexivity.
 Qed.
 
-Theorem Zi_eq_1 : forall a b c,
+Theorem Zi_eq : forall a b c,
 	(b = 0 /\ c = 1) \/ (b = 1 /\ c = -1) ->
 	i(2*a + b) = c.
 Proof.
@@ -80,8 +80,8 @@ Theorem Zi_pow_2_r : forall a b,
 	i (2*a + b) ^ 2 = 1.
 Proof.
 	intros.
+	rewrite Zi_mod_add.
 	unfold i.
-	rewrite Zmod_add_r.
 	rewrite Z.mod_small.
 	destruct H as [b0 | b1].
 	- replace b with 0.
@@ -99,8 +99,42 @@ Proof.
 		split.
 		discriminate.
 		reflexivity.
+Qed.
 
-	- discriminate.
+Theorem Zi_add_mul : forall a b c, 
+	(b = 0 /\ c = 1) \/
+	(b = 1 /\ c = 0) ->
+	i(2*a + b + c) = i(2*a) * i(b) * i(c).
+Proof.
+	unfold i.
+	intros.
+	destruct H.
+	destruct H.
+
+	- replace b with 0.
+		replace c with 1.
+		rewrite Z.mod_0_l.
+		rewrite Z.add_0_r.
+		rewrite Zmod_add_r.
+		rewrite Z.mul_comm with (n := 2) (m := a).
+		rewrite Z.mod_mul.
+		auto.
+		discriminate.
+		discriminate.
+		discriminate.
+
+	- destruct H.
+		replace b with 1.
+		replace c with 0.
+		rewrite Z.mod_0_l.
+		rewrite Z.add_0_r.
+		rewrite Zmod_add_r.
+		rewrite Z.mul_comm with (n := 2) (m := a).
+		rewrite Z.mod_mul.
+		auto.
+		discriminate.
+		discriminate.
+		discriminate.
 Qed.
 
 
@@ -119,15 +153,68 @@ Proof.
 Qed.
 
 
-Theorem Zj_pow_k : forall x, 
+Theorem Zj_pow_2_r : forall a b, 
+	b = 0 \/
+	b = 1 \/
+	b = 2 \/
+	b = 3 ->
+	j(4*a + b)^2 = 1.
+Proof.
+	intros a b bn.
+	unfold j.
+	
+	destruct bn as [b0 | bn].
+	replace b with 0.
+	auto.
+	rewrite Zmod_add_r.
+	replace 4 with (2*2).
+	rewrite Zmod_mul_add.
+	auto.
+	discriminate.
+	auto.
+	discriminate.
+
+	destruct bn as [b1 | bn].
+	replace b with 1.
+	rewrite Zmod_add_r.
+	replace 4 with (2*2).
+	rewrite Zmod_mul_add.
+	auto.
+	discriminate.
+	auto.
+	discriminate.
+
+	destruct bn as [x2 | x3].
+	replace b with 2.
+	rewrite Zmod_add_r.
+	replace 4 with (2*2).
+	rewrite Zmod_mul_add.
+	auto.
+	discriminate.
+	auto.
+	discriminate.
+	
+	replace b with 3.
+	rewrite Zmod_add_r.
+	replace 4 with (2*2).
+	rewrite Zmod_mul_add.
+	auto.
+	discriminate.
+	auto.
+	discriminate.
+Qed.
+
+
+Theorem Zj_mul_2_l : forall x, 
 	x = 0 \/
 	x = 1 \/
 	x = 2 \/
 	x = 3 ->
-	j(x)^2 = 1.
+	j(2*x) = i(x).
 Proof.
 	intros x xn.
 	unfold j.
+	unfold i.
 	
 	destruct xn as [x0 | xn].
 	replace (x) with (0).
@@ -144,4 +231,3 @@ Proof.
 	replace (x) with (3).
 	auto.
 Qed.
-

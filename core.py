@@ -22,9 +22,6 @@ class i(Function):
                 case 1: return -1
                 case 2: return 1
                 case 3: return -1
-        if n.is_Add:
-            h, t = n.as_two_terms()
-            return i(h)*i(t)
 
 
 class j(Function):
@@ -37,9 +34,6 @@ class j(Function):
                 case 1: return 1
                 case 2: return -1
                 case 3: return -1
-        if n.is_Add:
-            h, t = n.as_two_terms()
-            return j(h)*j(t)
 
 
 class k(Function):
@@ -52,9 +46,6 @@ class k(Function):
                 case 1: return -1
                 case 2: return -1
                 case 3: return 1
-        if n.is_Add:
-            h, t = n.as_two_terms()
-            return k(h)*k(t)
 
 
 # define some global symbols
@@ -197,6 +188,7 @@ def shift_polynomial(f: Add, v: Symbol, w: Symbol, shift: Add) -> Add:
     # introduce q to be incrementally substituted with shift
     g: Add = f.subs({v: v + q}).expand()
 
+    # TODO: add more replacers for encoding.
     # encode everything to reduce to simpler form
     for s in [a, b]:
         for ii in range(18):

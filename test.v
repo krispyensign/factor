@@ -5,7 +5,12 @@ Require Import Zpow_facts.
 Local Open Scope Z_scope.
 
 Definition i x := 1 - 2*(x mod 2).
-Definition j x := - (x mod 4) + (x mod 2) + 1.
+(* 
+	i = 1 - 2*m
+	i - 1 = 2*m
+	i - 1 / 2 = m
+*)
+Definition j x := - (x mod 4) + (1 - i(x))/2 + 1.
 Definition k x := j(x + 1).
 
 Lemma Zmod_add_r : forall a b c, c <> 0 -> (c * b + a) mod c = a mod c.
@@ -56,11 +61,12 @@ Proof.
 	- subst. rewrite Zi_mod_add. auto.
 Qed.
 
-Theorem Zj_mod_add : forall x k, j(4*k + x) = j(x).
+Theorem Zj_mod_add : forall a b, j(4*a + b) = j(b).
 Proof.
 	intros.
 	unfold j.
 	rewrite Zmod_add_r.
+	unfold i.
 	replace (4) with (2 * 2).
 	rewrite Zmod_mul_add.
 	- reflexivity.
@@ -154,3 +160,46 @@ Proof.
 			+ subst. auto.
 Qed.
 
+Theorem Zk_mul_2_l : forall a, 0 <= a -> k(2*a) = i(a).
+Proof.
+	intros.
+	unfold k.
+	unfold j.
+	unfold i.
+	rewrite Zmod_add_r.
+	rewrite Z.mod_small with (b:=2).
+	rewrite Z.mul_1_r.
+	replace (1 - 2) with (-1).
+	replace (1 - -1) with 2.
+	replace (2 / 2) with 1.
+	replace 4 with (2*2).
+	rewrite Z.mul_comm.
+	rewrite Z.add_mul_mod_distr_r.
+	rewrite Z.opp_add_distr.
+	rewrite Z.add_opp_r.
+	rewrite Z.mul_comm.
+	rewrite Z.sub_add.
+	rewrite Z.add_comm.
+	rewrite Z.add_opp_r.
+	reflexivity.
+	assumption.
+	reflexivity.
+	split.
+	discriminate.
+	reflexivity.
+	simpl.
+	reflexivity.
+	auto.
+	simpl.
+	reflexivity.
+	auto.
+	split.
+	discriminate.
+	reflexivity.
+	discriminate.
+Qed.
+
+	
+
+
+	

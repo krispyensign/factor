@@ -4,8 +4,9 @@ Require Import Zpow_facts.
 
 Local Open Scope Z_scope.
 
-Definition i (x : Z) : Z := 1 - 2*(x mod 2).
-Definition j (x : Z) : Z := - (x mod 4) + (x mod 2) + 1.
+Definition i x := 1 - 2*(x mod 2).
+Definition j x := - (x mod 4) + (x mod 2) + 1.
+Definition k x := j(x + 1).
 
 Lemma Zmod_add_r : forall a b c, c <> 0 -> (c * b + a) mod c = a mod c.
 Proof.
@@ -17,217 +18,139 @@ Proof.
 	assumption.
 Qed.
 
-Lemma sqrt_sqr_1 : forall x, x = 1 \/ x = -1 -> x^2 = 1.
-Proof.
-	intros.
-	rewrite Z.pow_2_r.
-	destruct H.
-	replace (x) with (1).
-	reflexivity.
-	replace (x) with (-1).
-	reflexivity.
-Qed.
-
 Lemma Zmod_mul_add : forall a b c d, c <> 0 -> (c * b * d + a) mod c = a mod c.
 Proof.
 	intros.
 	pose (k := b * d).
 	replace (c*b*d) with (c*k).
 	rewrite Zmod_add_r.
+	- reflexivity.
+	- assumption.
+	- subst k. rewrite Z.mul_assoc. reflexivity.
+Qed.
+
+Theorem Zi_mod_add : forall x k, i(2*k + x) = i(x).
+Proof.
+	unfold i.
+	intros.
+	rewrite Zmod_add_r.
 	reflexivity.
-	assumption.
-	subst k.
-	rewrite Z.mul_assoc.
-	reflexivity.
+	discriminate.
 Qed.
 
 Theorem Zi_eq : forall a b c,
 	(b = 0 /\ c = 1) \/ (b = 1 /\ c = -1) ->
 	i(2*a + b) = c.
 Proof.
-	intros.
-	unfold i.
-	rewrite Zmod_add_r.
-	destruct H as [bc0 | bc1].
-	- destruct bc0 as [d e].
-		replace b with 0.
-		replace c with 1.
-		simpl.
-		reflexivity.
-
-	- destruct bc1 as [d e].
-		replace b with 1.
-		replace c with (-1).
-		simpl.
-		reflexivity.
-
-	- discriminate.
+	intros a b c [H0 | H1].
+	- destruct H0 as [b0 c0]. rewrite Zi_mod_add. subst. auto.
+	- destruct H1 as [b1 c1]. rewrite Zi_mod_add. subst. auto.
 Qed.
-
-
-Theorem Zi_mod_add : forall x k, i (2*k + x) = i (x).
-Proof.
-	unfold i.
-	intros.
-	rewrite Zmod_add_r.
-	reflexivity.
-	discriminate.
-Qed.
-
 
 Theorem Zi_pow_2_r : forall a b,
   b = 0 \/ b = 1 ->
 	i (2*a + b) ^ 2 = 1.
 Proof.
-	intros.
-	rewrite Zi_mod_add.
-	unfold i.
-	rewrite Z.mod_small.
-	destruct H as [b0 | b1].
-	- replace b with 0.
-		auto.
-
-	- replace b with 1.
-		auto.
-
-	- destruct H as [b0 | b1].
-		replace b with 0.
-		split.
-		reflexivity.
-		reflexivity.
-		replace b with 1.
-		split.
-		discriminate.
-		reflexivity.
+	intros a b [b0 | b1].
+	- subst. rewrite Zi_mod_add. auto.
+	- subst. rewrite Zi_mod_add. auto.
 Qed.
 
-Theorem Zi_add_mul : forall a b c, 
-	(b = 0 /\ c = 1) \/
-	(b = 1 /\ c = 0) ->
-	i(2*a + b + c) = i(2*a) * i(b) * i(c).
-Proof.
-	unfold i.
-	intros.
-	destruct H.
-	destruct H.
-
-	- replace b with 0.
-		replace c with 1.
-		rewrite Z.mod_0_l.
-		rewrite Z.add_0_r.
-		rewrite Zmod_add_r.
-		rewrite Z.mul_comm with (n := 2) (m := a).
-		rewrite Z.mod_mul.
-		auto.
-		discriminate.
-		discriminate.
-		discriminate.
-
-	- destruct H.
-		replace b with 1.
-		replace c with 0.
-		rewrite Z.mod_0_l.
-		rewrite Z.add_0_r.
-		rewrite Zmod_add_r.
-		rewrite Z.mul_comm with (n := 2) (m := a).
-		rewrite Z.mod_mul.
-		auto.
-		discriminate.
-		discriminate.
-		discriminate.
-Qed.
-
-
-Theorem Zj_eq : forall x k, j(4*k + x) = j(x).
+Theorem Zj_mod_add : forall x k, j(4*k + x) = j(x).
 Proof.
 	intros.
 	unfold j.
 	rewrite Zmod_add_r.
 	replace (4) with (2 * 2).
 	rewrite Zmod_mul_add.
-	reflexivity.
-	discriminate.
-	simpl.
-	reflexivity.
-	discriminate.
+	- reflexivity.
+	- discriminate.
+	- simpl. reflexivity.
+	- discriminate.
 Qed.
 
+Theorem Zj_eq : forall a b c,
+	(b = 0 /\ c = 1) \/ (b = 1 /\ c = 1) \/ (b = 2 /\ c = -1) \/ (b = 3 /\ c = -1) ->
+	j(4*a + b) = c.
+Proof.
+	intros a b c HN.
+	rewrite Zj_mod_add.
+	destruct HN as [(b0, c0) | HN]. subst. auto.
+	- destruct HN as [(b1, c1) | HN]. subst. auto.
+		* destruct HN as [(b2, c2) | (b3, c3)]. subst. auto.
+			+ subst. auto.
+Qed.
 
-Theorem Zj_pow_2_r : forall a b, 
+Theorem Zj_pow_2_r : forall a b,
 	b = 0 \/
 	b = 1 \/
 	b = 2 \/
 	b = 3 ->
 	j(4*a + b)^2 = 1.
 Proof.
-	intros a b bn.
-	unfold j.
-	
-	destruct bn as [b0 | bn].
-	replace b with 0.
-	auto.
-	rewrite Zmod_add_r.
-	replace 4 with (2*2).
-	rewrite Zmod_mul_add.
-	auto.
-	discriminate.
-	auto.
-	discriminate.
-
-	destruct bn as [b1 | bn].
-	replace b with 1.
-	rewrite Zmod_add_r.
-	replace 4 with (2*2).
-	rewrite Zmod_mul_add.
-	auto.
-	discriminate.
-	auto.
-	discriminate.
-
-	destruct bn as [x2 | x3].
-	replace b with 2.
-	rewrite Zmod_add_r.
-	replace 4 with (2*2).
-	rewrite Zmod_mul_add.
-	auto.
-	discriminate.
-	auto.
-	discriminate.
-	
-	replace b with 3.
-	rewrite Zmod_add_r.
-	replace 4 with (2*2).
-	rewrite Zmod_mul_add.
-	auto.
-	discriminate.
-	auto.
-	discriminate.
+	intros.
+	rewrite Zj_mod_add.
+	destruct H as [H0 | HN]. subst. auto.
+	- destruct HN as [H1 | HN]. subst. auto.
+		* destruct HN as [H2 | H3]. subst. auto.
+			+ subst. auto.
 Qed.
 
-
-Theorem Zj_mul_2_l : forall x, 
-	x = 0 \/
-	x = 1 \/
-	x = 2 \/
-	x = 3 ->
-	j(2*x) = i(x).
+Theorem Zj_mul_2_l : forall a,
+	j(2*a) = i(a).
 Proof.
-	intros x xn.
+	intros.
 	unfold j.
+	rewrite Z.mul_comm with (m := a) (n := 2).
+	rewrite Z.mod_mul.
+	rewrite Z.add_0_r.
+	rewrite Z.add_comm.
+	rewrite Z.add_opp_r.
 	unfold i.
-	
-	destruct xn as [x0 | xn].
-	replace (x) with (0).
-	auto.
+	replace 4 with (2*2).
+	rewrite Z.mul_mod_distr_r.
+	rewrite Z.mul_comm.
+	reflexivity.
+	discriminate.
+	discriminate.
+	simpl. auto.
+	discriminate.
+Qed.
 
-	destruct xn as [x1 | xn].
-	replace (x) with (1).
-	auto.
-
-	destruct xn as [x2 | x3].
-	replace (x) with (2).
-	auto.
-	
-	replace (x) with (3).
+Theorem Zk_mod_add : forall a b, 
+	k(4*a + b) = k(b).
+Proof.
+	intros.
+	unfold k.
+	rewrite <- Z.add_assoc.
+	rewrite Zj_mod_add.
 	auto.
 Qed.
+
+Theorem Zk_eq : forall a b c,
+	(b = 0 /\ c = 1) \/ (b = 1 /\ c = -1) \/ (b = 2 /\ c = -1) \/ (b = 3 /\ c = 1) ->
+	k(4*a + b) = c.
+Proof.
+	intros a b c HN.
+	rewrite Zk_mod_add.
+	destruct HN as [(b0, c0) | HN]. subst. auto.
+	- destruct HN as [(b1, c1) | HN]. subst. auto.
+		* destruct HN as [(b2, c2) | (b3, c3)]. subst. auto.
+			+ subst. auto.
+Qed.
+
+Theorem Zk_pow_2_r : forall a b,
+	b = 0 \/
+	b = 1 \/
+	b = 2 \/
+	b = 3 ->
+	k(4*a + b)^2 = 1.
+Proof.
+	intros.
+	rewrite Zk_mod_add.
+	destruct H as [H0 | HN]. subst. auto.
+	- destruct HN as [H1 | HN]. subst. auto.
+		* destruct HN as [H2 | H3]. subst. auto.
+			+ subst. auto.
+Qed.
+

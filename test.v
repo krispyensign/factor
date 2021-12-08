@@ -1,14 +1,15 @@
 Require Import BinInt.
-Require Import BinNat.
-Require Import Zpow_facts.
+Require Import ZArith.
+Require Import Lia.
 
 Local Open Scope Z_scope.
 
-Definition i x := 1 - 2*(x mod 2).
-Definition j x := - (x mod 4) + (x mod 2) + 1.
-Definition k x := - ((x + 1) mod 4) + ((x + 1) mod 2) + 1.
+Ltac Zify.zify_post_hook ::= Z.div_mod_to_equations.
 
-Definition ii x := (-1)^x.
+Definition i x := 1 - 2*(x mod 2).
+Definition j x := - (x mod 4) + (1 - i(x))/2 + 1.
+Definition k x := j(x + 1).
+
 
 Lemma Zmod_add_r : forall a b c, c <> 0 -> (c * b + a) mod c = a mod c.
 Proof.
@@ -20,158 +21,161 @@ Proof.
 	assumption.
 Qed.
 
+
 Lemma Zmod_mul_add : forall a b c d, c <> 0 -> (c * b * d + a) mod c = a mod c.
 Proof.
 	intros.
 	pose (k := b * d).
 	replace (c*b*d) with (c*k).
 	rewrite Zmod_add_r.
-	reflexivity.
-	assumption.
-	subst k.
-	rewrite Z.mul_assoc.
-	reflexivity.
+	- reflexivity.
+	- assumption.
+	- subst k. rewrite Z.mul_assoc. reflexivity.
 Qed.
+
+
+Theorem Zi_mod_add : forall x k, i(2*k + x) = i(x).
+Proof.
+	intros.
+	unfold i.
+	rewrite Zmod_add_r.
+	reflexivity.
+	discriminate.
+Qed.
+
 
 Theorem Zi_eq : forall a b c, (b = 0 /\ c = 1) \/ (b = 1 /\ c = -1) ->
 	i(2*a + b) = c.
 Proof.
 	intros.
-	unfold i.
-	rewrite Zmod_add_r.
-	destruct H as [bc0 | bc1].
-	- destruct bc0 as [d e].
-		replace b with 0.
-		replace c with 1.
-		simpl.
-		reflexivity.
-
-	- destruct bc1 as [d e].
-		replace b with 1.
-		replace c with (-1).
-		simpl.
-		reflexivity.
-
-	- discriminate.
+	destruct H as [[b0 c0] | [b1 c1]].
+	- subst. rewrite Zi_mod_add. auto.
+	- subst. rewrite Zi_mod_add. auto.
 Qed.
 
-Theorem Zi_mod_add : forall x k, i (2*k + x) = i (x).
-Proof.
-	unfold i.
-	intros.
-	rewrite Zmod_add_r.
-	reflexivity.
-	discriminate.
-Qed.
 
 Theorem Zi_pow_2_r : forall a b, b = 0 \/ b = 1 -> i (2*a + b) ^ 2 = 1.
 Proof.
-	intros.
-	rewrite Zi_mod_add.
-	unfold i.
-	rewrite Z.mod_small.
-	destruct H as [b0 | b1].
-	- replace b with 0.
-		auto.
-
-	- replace b with 1.
-		auto.
-
-	- destruct H as [b0 | b1].
-		replace b with 0.
-		split.
-		reflexivity.
-		reflexivity.
-		replace b with 1.
-		split.
-		discriminate.
-		reflexivity.
+	intros a b [b0 | b1].
+	- subst. rewrite Zi_mod_add. auto.
+	- subst. rewrite Zi_mod_add. auto.
 Qed.
 
-Theorem Zi_add_mul : forall a b c d, b = 0 \/ b = 1 -> d = 0 \/ d = 1 ->
-	i(2*a + b)*i(2*c + d) = i(b + d).
-Proof.
-	intros.
-	repeat rewrite Zi_mod_add.
-	elim H.
-	elim H0.
-	
-	intros.
-	subst.
-	auto.
-	
-	intros.
-	subst.
-	auto.
-	
-	elim H0.
-	
-	intros.
-	subst.
-	auto.
-	
-	intros.
-	subst.
-	auto.
-Qed.
 
-Theorem Zj_eq : forall x k, j(4*k + x) = j(x).
+Theorem Zj_mod_add : forall a b, j(4*a + b) = j(b).
 Proof.
 	intros.
 	unfold j.
 	rewrite Zmod_add_r.
+	unfold i.
 	replace (4) with (2 * 2).
 	rewrite Zmod_mul_add.
-	reflexivity.
-	discriminate.
-	simpl.
-	reflexivity.
-	discriminate.
+	- reflexivity.
+	- discriminate.
+	- simpl. reflexivity.
+	- discriminate.
 Qed.
+
+
+Theorem Zj_eq : forall a b c,
+	(b = 0 /\ c = 1) \/ (b = 1 /\ c = 1) \/ (b = 2 /\ c = -1) \/ (b = 3 /\ c = -1) ->
+	j(4*a + b) = c.
+Proof.
+	intros.
+	rewrite Zj_mod_add.
+	destruct H as [(b0, c0) | [(b1, c1) | [(b2, c2) | (b3, c3)]]].
+	- subst. auto.
+	- subst. auto.
+	- subst. auto.
+	- subst. auto.
+Qed.
+
 
 Theorem Zj_pow_2_r : forall a b, b = 0 \/ b = 1 \/ b = 2 \/ b = 3 ->
-	j(4*a + b)^2 = 1.
+  j(4*a + b)^2 = 1.
 Proof.
 	intros.
-	rewrite Zj_eq.
-	elim H.
+	rewrite Zj_mod_add.
+	destruct H as [b0 | [b1 | [b2 | b3]]].
+	- subst. auto.
+	- subst. auto.
+	- subst. auto.
+	- subst. auto.
+Qed.
 
-	intros.
-	subst.
-	auto.
 
+Theorem Zj_mul_2_l : forall a, j(2*a) = i(a).
+Proof.
 	intros.
-	elim H0.
+	unfold j.
+	rewrite Z.mul_comm with (m := a) (n := 2).
+	unfold i.
+	rewrite Z.mod_mul.
+  zify.
+  lia.
+  discriminate.
+Qed.
 
-	intros.
-	subst.
-	auto.
 
+Theorem Zk_mod_add : forall a b, k(4*a + b) = k(b).
+Proof.
 	intros.
-	subst.
-	auto.
-
-	intros.
-	elim H1.
-
-	intros.
-	subst.
-	auto.
-
-	intros.
-	subst.
+	unfold k.
+	rewrite <- Z.add_assoc.
+	rewrite Zj_mod_add.
 	auto.
 Qed.
 
-Theorem Zj_mul_2_l : forall a, a = 0 \/ a = 1 ->
-	j(2*a) = i(a).
+
+Theorem Zk_eq : forall a b c,
+	(b = 0 /\ c = 1) \/ (b = 1 /\ c = -1) \/ (b = 2 /\ c = -1) \/ (b = 3 /\ c = 1) ->
+	k(4*a + b) = c.
 Proof.
 	intros.
-	elim H.
+	rewrite Zk_mod_add.
+	destruct H as [(b0, c0) | [(b1, c1) | [(b2, c2) | (b3, c3)]]].
+	- subst. auto.
+	- subst. auto.
+	- subst. auto.
+	- subst. auto.
+Qed.
+
+
+Theorem Zk_pow_2_r : forall a b, b = 0 \/ b = 1 \/ b = 2 \/ b = 3 ->
+	k(4*a + b)^2 = 1.
+Proof.
 	intros.
-	subst.
-	auto.
+	rewrite Zk_mod_add.
+	destruct H as [b0 | [b1 | [b2 | b3]]].
+	- subst. auto.
+	- subst. auto.
+	- subst. auto.
+	- subst. auto.
+Qed.
+
+
+Theorem Zi_add_1_l : forall a, a = 0 \/ a = 1 -> i(a + 1) = -i(a).
+Proof.
+	intros a [a0 | a1].
+	- unfold i. subst. auto.
+	- unfold i. subst. auto.
+Qed.
+
+
+Theorem Zj_mul_add_1_l : forall a, j(2*a + 1) = i(a).
+Proof.
 	intros.
-	subst.
-	auto.
+	unfold j.
+  rewrite Zi_mod_add.
+	unfold i.
+  lia.
+Qed.
+
+
+Theorem Zk_mul_2_l : forall a, k(2*a) = i(a).
+Proof.
+  intros.
+  unfold k.
+  rewrite Zj_mul_add_1_l.
+  reflexivity.
 Qed.

@@ -10,6 +10,11 @@ Ltac Zify.zify_post_hook ::= Z.div_mod_to_equations.
 Definition i x := 1 - 2*(x mod 2).
 Definition j x := - (x mod 4) + (1 - i(x))/2 + 1.
 Definition k x := j(x + 1).
+Definition H (a : Z) (b : Z) (c : Z) (d : Z) (x : Z) :=
+	((a + b + c + d) +
+	(a - b + c - d)*i(x) +
+	(a + b - c - d)*j(x) +
+	(a - b - c + d)*k(x))/4.
 
 
 Lemma Zmod_add_r : forall a b c, c <> 0 -> (c * b + a) mod c = a mod c.
@@ -180,3 +185,50 @@ Proof.
 	rewrite Zj_mul_add_1_l.
 	reflexivity.
 Qed.
+
+
+Theorem ZH_eq : forall a b c d v x,
+	(x = 0 /\ v = a) \/
+	(x = 1 /\ v = b) \/
+	(x = 2 /\ v = c) \/
+	(x = 3 /\ v = d) ->
+	(H a b c d x) = v.
+Proof.
+	intros a b c d v x Hn.
+	destruct Hn as [H0 | [H1 | [H2 | H3]]].
+	- destruct H0.
+		subst.
+		unfold H.
+		unfold k.
+		unfold j.
+		unfold i.
+		simpl.
+		zify.
+		lia.
+	- destruct H1.
+		subst.
+		unfold H.
+		unfold k.
+		unfold j.
+		unfold i.
+		simpl.
+		zify.
+		lia.
+	- destruct H2.
+		subst.
+		unfold H.
+		unfold k.
+		unfold j.
+		unfold i.
+		simpl.
+		zify.
+		lia.
+	- destruct H3.
+		subst.
+		unfold H.
+		unfold k.
+		unfold j.
+		unfold i.
+		simpl.
+		zify.
+		lia.

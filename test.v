@@ -6,6 +6,7 @@ Local Open Scope Z_scope.
 
 Ltac Zify.zify_post_hook ::= Z.div_mod_to_equations.
 
+
 Definition i x := 1 - 2*(x mod 2).
 Definition j x := - (x mod 4) + (1 - i(x))/2 + 1.
 Definition k x := j(x + 1).
@@ -92,7 +93,7 @@ Qed.
 
 
 Theorem Zj_pow_2_r : forall a b, b = 0 \/ b = 1 \/ b = 2 \/ b = 3 ->
-  j(4*a + b)^2 = 1.
+	j(4*a + b)^2 = 1.
 Proof.
 	intros.
 	rewrite Zj_mod_add.
@@ -111,9 +112,9 @@ Proof.
 	rewrite Z.mul_comm with (m := a) (n := 2).
 	unfold i.
 	rewrite Z.mod_mul.
-  zify.
-  lia.
-  discriminate.
+	zify.
+	lia.
+	discriminate.
 Qed.
 
 
@@ -157,8 +158,8 @@ Qed.
 Theorem Zi_add_1_l : forall a, a = 0 \/ a = 1 -> i(a + 1) = -i(a).
 Proof.
 	intros a [a0 | a1].
-	- unfold i. subst. auto.
-	- unfold i. subst. auto.
+	- subst. auto.
+	- subst. auto.
 Qed.
 
 
@@ -166,16 +167,16 @@ Theorem Zj_mul_add_1_l : forall a, j(2*a + 1) = i(a).
 Proof.
 	intros.
 	unfold j.
-  rewrite Zi_mod_add.
+	rewrite Zi_mod_add.
 	unfold i.
-  lia.
+	lia.
 Qed.
 
 
 Theorem Zk_mul_2_l : forall a, k(2*a) = i(a).
 Proof.
-  intros.
-  unfold k.
-  rewrite Zj_mul_add_1_l.
-  reflexivity.
+	intros.
+	unfold k.
+	rewrite Zj_mul_add_1_l.
+	reflexivity.
 Qed.

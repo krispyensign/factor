@@ -223,3 +223,25 @@ Proof.
 	- destruct H3. subst. simpl. zify. lia.
 Qed.
 
+Theorem ZW_mod_add_l : forall a b c d u v w,
+	(v = 0 /\ w = a) \/
+	(v = 1 /\ w = b) \/
+	(v = 2 /\ w = c) \/
+	(v = 3 /\ w = d) ->
+	(W a b c d (4*u + v)) = w.
+Proof.
+	intros a b c d u v w H.
+	unfold W.
+	rewrite Zj_mod_add.
+	rewrite Zk_mod_add.
+	replace (4*u) with (2*(2*u)).
+
+	rewrite Zi_mod_add with (k := 2*u).
+	simpl.
+	unfold k. unfold j. unfold i.
+	destruct H as [H0 | [H1 | [H2 | H3]]].
+	- destruct H0. subst. simpl. zify. lia.
+	- destruct H1. subst. simpl. zify. lia.
+	- destruct H2. subst. simpl. zify. lia.
+	- destruct H3. subst. simpl. zify. lia.
+Qed.

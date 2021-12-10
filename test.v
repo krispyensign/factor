@@ -201,3 +201,25 @@ Proof.
 	- destruct H1. subst. simpl. zify. lia.
 	- destruct H2. subst. simpl. zify. lia.
 	- destruct H3. subst. simpl. zify. lia.
+Qed.
+
+Theorem ZW_W_l : forall a b c d v w,
+	(v = 0 /\ w = a) \/
+	(v = 1 /\ w = b) \/
+	(v = 2 /\ w = c) \/
+	(v = 3 /\ w = d) ->
+	(W  (W a b c d 0)
+		(W a b c d 1)
+		(W a b c d 2)
+		(W a b c d 3)
+		v) = w.
+Proof.
+	intros a b c d v w H.
+	unfold W. unfold W. unfold k. unfold j. unfold i.
+	destruct H as [H0 | [H1 | [H2 | H3]]].
+	- destruct H0. subst. simpl. zify. lia.
+	- destruct H1. subst. simpl. zify. lia.
+	- destruct H2. subst. simpl. zify. lia.
+	- destruct H3. subst. simpl. zify. lia.
+Qed.
+

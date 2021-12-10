@@ -244,3 +244,24 @@ Proof.
 	- destruct H2. subst. simpl. zify. lia.
 	- destruct H3. subst. simpl. zify. lia.
 Qed.
+
+Theorem ZW_W_add_l : forall a b c d e f g h v w,
+	(v = 0 /\ w = a + e) \/
+	(v = 1 /\ w = b + f) \/
+	(v = 2 /\ w = c + g) \/
+	(v = 3 /\ w = d + h) ->
+	(W  ((W a b c d 0) + e)
+		((W a b c d 1) + f)
+		((W a b c d 2) + g)
+		((W a b c d 3) + h)
+		v) = w.
+Proof.
+	intros a b c d e f g h v w H.
+	unfold W. unfold W. unfold k. unfold j. unfold i.
+	destruct H as [H0 | [H1 | [H2 | H3]]].
+	- destruct H0. subst. simpl. zify. lia.
+	- destruct H1. subst. simpl. zify. lia.
+	- destruct H2. subst. simpl. zify. lia.
+	- destruct H3. subst. simpl. zify. lia.
+Qed.
+

@@ -223,6 +223,7 @@ Proof.
 	- destruct H1. subst. simpl. zify. lia.
 	- destruct H2. subst. simpl. zify. lia.
 	- destruct H3. subst. simpl. zify. lia.
+	- rewrite Z.mul_assoc. auto. 
 Qed.
 
 Theorem ZW_W_l : forall a b c d v w,

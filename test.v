@@ -265,4 +265,3 @@ Proof.
 	- destruct H2. subst. simpl. zify. lia.
 	- destruct H3. subst. simpl. zify. lia.
 Qed.
-

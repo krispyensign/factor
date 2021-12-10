@@ -10,7 +10,7 @@ Ltac Zify.zify_post_hook ::= Z.div_mod_to_equations.
 Definition i x := 1 - 2*(x mod 2).
 Definition j x := - (x mod 4) + (1 - i(x))/2 + 1.
 Definition k x := j(x + 1).
-Definition H (a : Z) (b : Z) (c : Z) (d : Z) (x : Z) :=
+Definition W (a : Z) (b : Z) (c : Z) (d : Z) (x : Z) :=
 	((a + b + c + d) +
 	(a - b + c - d)*i(x) +
 	(a + b - c - d)*j(x) +
@@ -54,7 +54,7 @@ Theorem Zi_eq : forall a b c, (b = 0 /\ c = 1) \/ (b = 1 /\ c = -1) ->
 	i(2*a + b) = c.
 Proof.
 	intros.
-	destruct H as [[b0 c0] | [b1 c1]].
+	destruct H as [(b0, c0) | (b1, c1)].
 	- subst. rewrite Zi_mod_add. auto.
 	- subst. rewrite Zi_mod_add. auto.
 Qed.
@@ -187,48 +187,17 @@ Proof.
 Qed.
 
 
-Theorem ZH_eq : forall a b c d v x,
-	(x = 0 /\ v = a) \/
-	(x = 1 /\ v = b) \/
-	(x = 2 /\ v = c) \/
-	(x = 3 /\ v = d) ->
-	(H a b c d x) = v.
+Theorem ZW_eq : forall a b c d v w,
+	(v = 0 /\ w = a) \/
+	(v = 1 /\ w = b) \/
+	(v = 2 /\ w = c) \/
+	(v = 3 /\ w = d) ->
+	(W a b c d v) = w.
 Proof.
-	intros a b c d v x Hn.
-	destruct Hn as [H0 | [H1 | [H2 | H3]]].
-	- destruct H0.
-		subst.
-		unfold H.
-		unfold k.
-		unfold j.
-		unfold i.
-		simpl.
-		zify.
-		lia.
-	- destruct H1.
-		subst.
-		unfold H.
-		unfold k.
-		unfold j.
-		unfold i.
-		simpl.
-		zify.
-		lia.
-	- destruct H2.
-		subst.
-		unfold H.
-		unfold k.
-		unfold j.
-		unfold i.
-		simpl.
-		zify.
-		lia.
-	- destruct H3.
-		subst.
-		unfold H.
-		unfold k.
-		unfold j.
-		unfold i.
-		simpl.
-		zify.
-		lia.
+	intros a b c d v w H.
+	unfold W. unfold k. unfold j. unfold i.
+	destruct H as [H0 | [H1 | [H2 | H3]]].
+	- destruct H0. subst. simpl. zify. lia.
+	- destruct H1. subst. simpl. zify. lia.
+	- destruct H2. subst. simpl. zify. lia.
+	- destruct H3. subst. simpl. zify. lia.

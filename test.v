@@ -50,7 +50,20 @@ Proof.
 Qed.
 
 
-Theorem Zi_eq : forall a b c, (b = 0 /\ c = 1) \/ (b = 1 /\ c = -1) ->
+Theorem Zi_mod_add_4 : forall a b, i(4*a + b) = i(b).
+Proof.
+	intros.
+	unfold i.
+	replace (4*a) with (2*(2*a)).
+	rewrite Zmod_add_r.
+	reflexivity.
+	discriminate.
+	lia.
+Qed.
+
+
+Theorem Zi_eq : forall a b c, 
+	(b = 0 /\ c = 1) \/ (b = 1 /\ c = -1) ->
 	i(2*a + b) = c.
 Proof.
 	intros.
@@ -84,7 +97,10 @@ Qed.
 
 
 Theorem Zj_eq : forall a b c,
-	(b = 0 /\ c = 1) \/ (b = 1 /\ c = 1) \/ (b = 2 /\ c = -1) \/ (b = 3 /\ c = -1) ->
+	(b = 0 /\ c = 1) \/
+	(b = 1 /\ c = 1) \/
+	(b = 2 /\ c = -1) \/
+	(b = 3 /\ c = -1) ->
 	j(4*a + b) = c.
 Proof.
 	intros.
@@ -97,7 +113,8 @@ Proof.
 Qed.
 
 
-Theorem Zj_pow_2_r : forall a b, b = 0 \/ b = 1 \/ b = 2 \/ b = 3 ->
+Theorem Zj_pow_2_r : forall a b,
+	b = 0 \/ b = 1 \/ b = 2 \/ b = 3 ->
 	j(4*a + b)^2 = 1.
 Proof.
 	intros.
@@ -134,7 +151,10 @@ Qed.
 
 
 Theorem Zk_eq : forall a b c,
-	(b = 0 /\ c = 1) \/ (b = 1 /\ c = -1) \/ (b = 2 /\ c = -1) \/ (b = 3 /\ c = 1) ->
+	(b = 0 /\ c = 1) \/
+	(b = 1 /\ c = -1) \/
+	(b = 2 /\ c = -1) \/
+	(b = 3 /\ c = 1) ->
 	k(4*a + b) = c.
 Proof.
 	intros.
@@ -147,7 +167,8 @@ Proof.
 Qed.
 
 
-Theorem Zk_pow_2_r : forall a b, b = 0 \/ b = 1 \/ b = 2 \/ b = 3 ->
+Theorem Zk_pow_2_r : forall a b,
+	b = 0 \/ b = 1 \/ b = 2 \/ b = 3 ->
 	k(4*a + b)^2 = 1.
 Proof.
 	intros.
@@ -203,30 +224,21 @@ Proof.
 	- destruct H3. subst. simpl. zify. lia.
 Qed.
 
-Theorem ZW_mod_add_l : forall a b c d u v w,
-	(v = 0 /\ w = a) \/
-	(v = 1 /\ w = b) \/
-	(v = 2 /\ w = c) \/
-	(v = 3 /\ w = d) ->
-	(W a b c d (4*u + v)) = w.
+
+Theorem ZW_mod_add_l : forall a b c d u v,
+	v = 0 \/ v = 1 \/ v = 2 \/ v = 3 ->
+	(W a b c d (4*u + v)) = (W a b c d v).
 Proof.
-	intros a b c d u v w H.
+	intros a b c d u v H.
 	unfold W.
 	rewrite Zj_mod_add.
 	rewrite Zk_mod_add.
-	replace (4*u) with (2*(2*u)).
-	rewrite Zi_mod_add with (k := 2*u).
-	simpl.
-	unfold k. unfold j. unfold i.
-	destruct H as [H0 | [H1 | [H2 | H3]]].
-	- destruct H0. subst. simpl. zify. lia.
-	- destruct H1. subst. simpl. zify. lia.
-	- destruct H2. subst. simpl. zify. lia.
-	- destruct H3. subst. simpl. zify. lia.
-	- rewrite Z.mul_assoc. auto. 
+	rewrite Zi_mod_add_4.
+	reflexivity.
 Qed.
 
-Theorem ZW_W_l : forall a b c d v w,
+
+Theorem ZW_W_l : forall a b c d u v w,
 	(v = 0 /\ w = a) \/
 	(v = 1 /\ w = b) \/
 	(v = 2 /\ w = c) \/
@@ -235,18 +247,21 @@ Theorem ZW_W_l : forall a b c d v w,
 		(W a b c d 1)
 		(W a b c d 2)
 		(W a b c d 3)
-		v) = w.
+		(4*u + v)) = w.
 Proof.
-	intros a b c d v w H.
+	intros.
+	rewrite ZW_mod_add_l.
 	unfold W. unfold W. unfold k. unfold j. unfold i.
 	destruct H as [H0 | [H1 | [H2 | H3]]].
 	- destruct H0. subst. simpl. zify. lia.
 	- destruct H1. subst. simpl. zify. lia.
 	- destruct H2. subst. simpl. zify. lia.
 	- destruct H3. subst. simpl. zify. lia.
+	- lia.
 Qed.
 
-Theorem ZW_W_add_l : forall a b c d e f g h v w,
+
+Theorem ZW_W_add_l : forall a b c d e f g h u v w,
 	(v = 0 /\ w = a + e) \/
 	(v = 1 /\ w = b + f) \/
 	(v = 2 /\ w = c + g) \/
@@ -255,13 +270,15 @@ Theorem ZW_W_add_l : forall a b c d e f g h v w,
 		((W a b c d 1) + f)
 		((W a b c d 2) + g)
 		((W a b c d 3) + h)
-		v) = w.
+		(4*u + v)) = w.
 Proof.
-	intros a b c d e f g h v w H.
+	intros a b c d e f g h u v w H.
+	rewrite ZW_mod_add_l.
 	unfold W. unfold W. unfold k. unfold j. unfold i.
 	destruct H as [H0 | [H1 | [H2 | H3]]].
 	- destruct H0. subst. simpl. zify. lia.
 	- destruct H1. subst. simpl. zify. lia.
 	- destruct H2. subst. simpl. zify. lia.
 	- destruct H3. subst. simpl. zify. lia.
+	- lia.
 Qed.

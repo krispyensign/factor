@@ -247,7 +247,7 @@ Theorem ZW_W_l : forall a b c d u v w,
 		(W a b c d 1)
 		(W a b c d 2)
 		(W a b c d 3)
-		(4*u + v)) = w.
+		(4*u + v)) = (W a b c d v).
 Proof.
 	intros.
 	rewrite ZW_mod_add_l.
@@ -270,7 +270,7 @@ Theorem ZW_W_add_l : forall a b c d e f g h u v w,
 		((W a b c d 1) + f)
 		((W a b c d 2) + g)
 		((W a b c d 3) + h)
-		(4*u + v)) = w.
+		(4*u + v)) = (W (a + e) (b + f) (c + g) (d + h) v).
 Proof.
 	intros a b c d e f g h u v w H.
 	rewrite ZW_mod_add_l.

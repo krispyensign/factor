@@ -8,19 +8,22 @@ Ltac Zify.zify_post_hook ::= Z.div_mod_to_equations.
 
 
 Definition i x := 1 - 2*(x mod 2).
-Definition j x := - (x mod 4) + (1 - i(x))/2 + 1.
-Definition k x := j(x + 1).
-Definition W (a : Z) (b : Z) (c : Z) (d : Z) (x : Z) :=
+Definition j x := - (x mod 4) + (1 - (i x))/2 + 1.
+Definition k x := (j (x + 1)).
+Definition W a b c d x :=
 	((a + b + c + d) +
-	(a - b + c - d)*i(x) +
-	(a + b - c - d)*j(x) +
-	(a - b - c + d)*k(x))/4.
-Definition Wf (f : Z -> Z) (x : Z) :=
-	let a := f(0) in
-	let b := f(1) in
-	let c := f(2) in
-	let d := f(3) in
+	(a - b + c - d)*(i x) +
+	(a + b - c - d)*(j x) +
+	(a - b - c + d)*(k x))/4.
+Definition Wf (f : Z->Z) (x : Z) :=
+	let a := (f 0) in
+	let b := (f 1) in
+	let c := (f 2) in
+	let d := (f 3) in
 	(W a b c d x).
+
+Definition zip (f g : Z->Z) (n : Z) :=
+	(f n) + (g n).
 
 Lemma Zmod_add_r : forall a b c, c <> 0 -> (c * b + a) mod c = a mod c.
 Proof.
@@ -45,7 +48,7 @@ Proof.
 Qed.
 
 
-Theorem Zi_mod_add : forall x k, i(2*k + x) = i(x).
+Theorem Zi_mod_add : forall x k, (i (2*k + x)) = (i x).
 Proof.
 	intros.
 	unfold i.
@@ -55,7 +58,7 @@ Proof.
 Qed.
 
 
-Theorem Zi_mod_add_4 : forall a b, i(4*a + b) = i(b).
+Theorem Zi_mod_add_4 : forall a b, (i (4*a + b)) = (i b).
 Proof.
 	intros.
 	unfold i.
@@ -69,7 +72,7 @@ Qed.
 
 Theorem Zi_eq : forall a b c, 
 	(b = 0 /\ c = 1) \/ (b = 1 /\ c = -1) ->
-	i(2*a + b) = c.
+	(i (2*a + b)) = c.
 Proof.
 	intros.
 	destruct H as [(b0, c0) | (b1, c1)].
@@ -78,7 +81,7 @@ Proof.
 Qed.
 
 
-Theorem Zi_pow_2_r : forall a b, b = 0 \/ b = 1 -> i (2*a + b) ^ 2 = 1.
+Theorem Zi_pow_2_r : forall a b, b = 0 \/ b = 1 -> (i (2*a + b)) ^ 2 = 1.
 Proof.
 	intros a b [b0 | b1].
 	- subst. rewrite Zi_mod_add. auto.
@@ -86,7 +89,7 @@ Proof.
 Qed.
 
 
-Theorem Zj_mod_add : forall a b, j(4*a + b) = j(b).
+Theorem Zj_mod_add : forall a b, (j(4*a + b)) = (j b).
 Proof.
 	intros.
 	unfold j.
@@ -106,7 +109,7 @@ Theorem Zj_eq : forall a b c,
 	(b = 1 /\ c = 1) \/
 	(b = 2 /\ c = -1) \/
 	(b = 3 /\ c = -1) ->
-	j(4*a + b) = c.
+	(j (4*a + b)) = c.
 Proof.
 	intros.
 	rewrite Zj_mod_add.
@@ -120,7 +123,7 @@ Qed.
 
 Theorem Zj_pow_2_r : forall a b,
 	b = 0 \/ b = 1 \/ b = 2 \/ b = 3 ->
-	j(4*a + b)^2 = 1.
+	(j (4*a + b))^2 = 1.
 Proof.
 	intros.
 	rewrite Zj_mod_add.
@@ -132,7 +135,7 @@ Proof.
 Qed.
 
 
-Theorem Zj_mul_2_l : forall a, j(2*a) = i(a).
+Theorem Zj_mul_2_l : forall a, (j (2*a)) = (i a).
 Proof.
 	intros.
 	unfold j.
@@ -145,7 +148,7 @@ Proof.
 Qed.
 
 
-Theorem Zk_mod_add : forall a b, k(4*a + b) = k(b).
+Theorem Zk_mod_add : forall a b, (k (4*a + b)) = (k b).
 Proof.
 	intros.
 	unfold k.
@@ -160,7 +163,7 @@ Theorem Zk_eq : forall a b c,
 	(b = 1 /\ c = -1) \/
 	(b = 2 /\ c = -1) \/
 	(b = 3 /\ c = 1) ->
-	k(4*a + b) = c.
+	(k (4*a + b)) = c.
 Proof.
 	intros.
 	rewrite Zk_mod_add.
@@ -174,7 +177,7 @@ Qed.
 
 Theorem Zk_pow_2_r : forall a b,
 	b = 0 \/ b = 1 \/ b = 2 \/ b = 3 ->
-	k(4*a + b)^2 = 1.
+	(k (4*a + b))^2 = 1.
 Proof.
 	intros.
 	rewrite Zk_mod_add.
@@ -186,7 +189,7 @@ Proof.
 Qed.
 
 
-Theorem Zi_add_1_l : forall a, a = 0 \/ a = 1 -> i(a + 1) = -i(a).
+Theorem Zi_add_1_l : forall a, a = 0 \/ a = 1 -> (i (a + 1)) = -(i a).
 Proof.
 	intros a [a0 | a1].
 	- subst. auto.
@@ -194,7 +197,7 @@ Proof.
 Qed.
 
 
-Theorem Zj_mul_add_1_l : forall a, j(2*a + 1) = i(a).
+Theorem Zj_mul_add_1_l : forall a, (j (2*a + 1)) = (i a).
 Proof.
 	intros.
 	unfold j.
@@ -204,7 +207,7 @@ Proof.
 Qed.
 
 
-Theorem Zk_mul_2_l : forall a, k(2*a) = i(a).
+Theorem Zk_mul_2_l : forall a, (k (2*a)) = (i a).
 Proof.
 	intros.
 	unfold k.
@@ -290,10 +293,10 @@ Qed.
 
 
 Theorem ZWf_eq : forall (f : Z->Z) (v w : Z),
-	(v = 0 /\ w = f(0)) \/
-	(v = 1 /\ w = f(1)) \/
-	(v = 2 /\ w = f(2)) \/
-	(v = 3 /\ w = f(3)) ->
+	(v = 0 /\ w = (f 0)) \/
+	(v = 1 /\ w = (f 1)) \/
+	(v = 2 /\ w = (f 2)) \/
+	(v = 3 /\ w = (f 3)) ->
 	(Wf f v) = w.
 Proof.
 	intros f v w H.
@@ -329,13 +332,13 @@ Proof.
 	reflexivity.
 Qed.
 
-Theorem ZWf_Wf_l : forall (f : Z->Z) (u v w : Z),
+Theorem ZWf_Wf_l : forall (f : Z->Z) (u v : Z),
 	v = 0 \/ v = 1 \/ v = 2 \/ v = 3 ->
 	(Wf (Wf f) (4*u + v)) = (Wf f v).
 Proof.
 	intros.
 	rewrite ZWf_mod_add_l.
-	unfold Wf. unfold W. unfold W. unfold k. unfold j. unfold i.
+	unfold Wf. repeat unfold W. unfold k. unfold j. unfold i.
 	destruct H as [H0 | [H1 | [H2 | H3]]].
 	- subst. simpl. zify. lia.
 	- subst. simpl. zify. lia.
@@ -344,13 +347,13 @@ Proof.
 	- lia.
 Qed.
 
-Theorem ZWf_Wff_l : forall (f : Z->Z->Z) (t u v w : Z),
+Theorem ZWf_Wff_l : forall (f : Z->Z->Z) (t u v : Z),
 	v = 0 \/ v = 1 \/ v = 2 \/ v = 3 ->
 	(Wf (Wf (f t)) (4*u + v)) = (Wf (f t) v).
 Proof.
 	intros.
 	rewrite ZWf_mod_add_l.
-	unfold Wf. unfold W. unfold W. unfold k. unfold j. unfold i.
+	unfold Wf. repeat unfold W. unfold k. unfold j. unfold i.
 	destruct H as [H0 | [H1 | [H2 | H3]]].
 	- subst. simpl. zify. lia.
 	- subst. simpl. zify. lia.
@@ -359,7 +362,37 @@ Proof.
 	- lia.
 Qed.
 
-Theorem ZWf_if_l : forall (u v w : Z),
+Theorem ZWf_Wf_add_l : forall (g f : Z->Z) (u v : Z),
+	v = 0 \/ v = 1 \/ v = 2 \/ v = 3 ->
+	(Wf (zip g (Wf f)) (4*u + v)) = (Wf (zip g f) v).
+Proof.
+	intros.
+	rewrite ZWf_mod_add_l.
+	unfold zip. unfold Wf. repeat unfold W. unfold k. unfold j. unfold i.
+	destruct H as [H0 | [H1 | [H2 | H3]]].
+	- subst. simpl. zify. lia.
+	- subst. simpl. zify. lia.
+	- subst. simpl. zify. lia.
+	- subst. simpl. zify. lia.
+	- lia.
+Qed.
+
+Theorem ZWf_Wff_add_l : forall (g f : Z->Z->Z) (t u v : Z),
+	v = 0 \/ v = 1 \/ v = 2 \/ v = 3 ->
+	(Wf (zip (g t) (Wf (f t))) (4*u + v)) = (Wf (zip (g t) (f t)) v).
+Proof.
+	intros.
+	rewrite ZWf_mod_add_l.
+	unfold zip. unfold Wf. repeat unfold W. unfold k. unfold j. unfold i.
+	destruct H as [H0 | [H1 | [H2 | H3]]].
+	- subst. simpl. zify. lia.
+	- subst. simpl. zify. lia.
+	- subst. simpl. zify. lia.
+	- subst. simpl. zify. lia.
+	- lia.
+Qed.
+
+Theorem ZWf_if_l : forall (u v : Z),
 	v = 0 \/ v = 1 \/ v = 2 \/ v = 3 ->
 	(Wf i (4*u + v)) = (i v).
 Proof.
@@ -374,7 +407,7 @@ Proof.
 	- lia.
 Qed.
 
-Theorem ZWf_jf_l : forall (u v w : Z),
+Theorem ZWf_jf_l : forall (u v : Z),
 	v = 0 \/ v = 1 \/ v = 2 \/ v = 3 ->
 	(Wf j (4*u + v)) = (j v).
 Proof.
@@ -389,7 +422,7 @@ Proof.
 	- lia.
 Qed.
 
-Theorem ZWf_kf_l : forall (u v w : Z),
+Theorem ZWf_kf_l : forall (u v : Z),
 	v = 0 \/ v = 1 \/ v = 2 \/ v = 3 ->
 	(Wf k (4*u + v)) = (k v).
 Proof.

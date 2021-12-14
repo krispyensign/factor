@@ -25,6 +25,7 @@ Definition Wf (f : Z->Z) (x : Z) :=
 Definition zip (f g : Z->Z) (n : Z) :=
   (f n) + (g n).
 
+
 Lemma Zmod_add_r : forall a b c, c <> 0 -> (c * b + a) mod c = a mod c.
 Proof.
   intros.
@@ -83,13 +84,14 @@ Qed.
 
 Theorem Zi_pow_2_r : forall a b, b = 0 \/ b = 1 -> (i (2*a + b)) ^ 2 = 1.
 Proof.
-  intros a b [b0 | b1].
+  intros.
+  destruct H.
   - subst. rewrite Zi_mod_add. auto.
   - subst. rewrite Zi_mod_add. auto.
 Qed.
 
 
-Theorem Zj_mod_add : forall a b, (j(4*a + b)) = (j b).
+Theorem Zj_mod_add : forall a b, (j (4*a + b)) = (j b).
 Proof.
   intros.
   unfold j.
@@ -191,7 +193,8 @@ Qed.
 
 Theorem Zi_add_1_l : forall a, a = 0 \/ a = 1 -> (i (a + 1)) = -(i a).
 Proof.
-  intros a [a0 | a1].
+  intros.
+  destruct H.
   - subst. auto.
   - subst. auto.
 Qed.
@@ -223,13 +226,13 @@ Theorem ZW_eq : forall a b c d v w,
   (v = 3 /\ w = d) ->
   (W a b c d v) = w.
 Proof.
-  intros a b c d v w H.
+  intros.
   unfold W. unfold k. unfold j. unfold i.
   destruct H as [H0 | [H1 | [H2 | H3]]].
-  - destruct H0. subst. simpl. zify. lia.
-  - destruct H1. subst. simpl. zify. lia.
-  - destruct H2. subst. simpl. zify. lia.
-  - destruct H3. subst. simpl. zify. lia.
+  - destruct H0. subst. simpl. lia.
+  - destruct H1. subst. simpl. lia.
+  - destruct H2. subst. simpl. lia.
+  - destruct H3. subst. simpl. lia.
 Qed.
 
 
@@ -237,7 +240,7 @@ Theorem ZW_mod_add_l : forall a b c d u v,
   v = 0 \/ v = 1 \/ v = 2 \/ v = 3 ->
   (W a b c d (4*u + v)) = (W a b c d v).
 Proof.
-  intros a b c d u v H.
+  intros.
   unfold W.
   rewrite Zj_mod_add.
   rewrite Zk_mod_add.
@@ -246,12 +249,9 @@ Proof.
 Qed.
 
 
-Theorem ZW_W_l : forall a b c d u v w,
-  (v = 0 /\ w = a) \/
-  (v = 1 /\ w = b) \/
-  (v = 2 /\ w = c) \/
-  (v = 3 /\ w = d) ->
-  (W  (W a b c d 0)
+Theorem ZW_W_l : forall a b c d u v,
+  v = 0 \/ v = 1 \/ v = 2 \/ v = 3 ->
+  (W (W a b c d 0)
     (W a b c d 1)
     (W a b c d 2)
     (W a b c d 3)
@@ -261,34 +261,31 @@ Proof.
   rewrite ZW_mod_add_l.
   unfold W. unfold W. unfold k. unfold j. unfold i.
   destruct H as [H0 | [H1 | [H2 | H3]]].
-  - destruct H0. subst. simpl. zify. lia.
-  - destruct H1. subst. simpl. zify. lia.
-  - destruct H2. subst. simpl. zify. lia.
-  - destruct H3. subst. simpl. zify. lia.
-  - lia.
+  - subst. simpl. lia.
+  - subst. simpl. lia.
+  - subst. simpl. lia.
+  - subst. simpl. lia.
+  - assumption.
 Qed.
 
 
-Theorem ZW_W_add_l : forall a b c d e f g h u v w,
-  (v = 0 /\ w = a + e) \/
-  (v = 1 /\ w = b + f) \/
-  (v = 2 /\ w = c + g) \/
-  (v = 3 /\ w = d + h) ->
+Theorem ZW_W_add_l : forall a b c d e f g h u v,
+  v = 0 \/ v = 1 \/ v = 2 \/ v = 3 ->
   (W  ((W a b c d 0) + e)
     ((W a b c d 1) + f)
     ((W a b c d 2) + g)
     ((W a b c d 3) + h)
     (4*u + v)) = (W (a + e) (b + f) (c + g) (d + h) v).
 Proof.
-  intros a b c d e f g h u v w H.
+  intros.
   rewrite ZW_mod_add_l.
   unfold W. unfold W. unfold k. unfold j. unfold i.
   destruct H as [H0 | [H1 | [H2 | H3]]].
-  - destruct H0. subst. simpl. zify. lia.
-  - destruct H1. subst. simpl. zify. lia.
-  - destruct H2. subst. simpl. zify. lia.
-  - destruct H3. subst. simpl. zify. lia.
-  - lia.
+  - subst. simpl. lia.
+  - subst. simpl. lia.
+  - subst. simpl. lia.
+  - subst. simpl. lia.
+  - assumption.
 Qed.
 
 
@@ -299,20 +296,23 @@ Theorem ZWf_eq : forall (f : Z->Z) (v w : Z),
   (v = 3 /\ w = (f 3)) ->
   (Wf f v) = w.
 Proof.
-  intros f v w H.
+  intros.
   unfold Wf. unfold W. unfold k. unfold j. unfold i.
   destruct H as [H0 | [H1 | [H2 | H3]]].
-  - destruct H0. subst. simpl. zify. lia.
-  - destruct H1. subst. simpl. zify. lia.
-  - destruct H2. subst. simpl. zify. lia.
-  - destruct H3. subst. simpl. zify. lia.
+  - destruct H0. subst. simpl. lia.
+  - destruct H1. subst. simpl. lia.
+  - destruct H2. subst. simpl. lia.
+  - destruct H3. subst. simpl. lia.
 Qed.
 
+(*
+  For any periodic function f, Wf f is also periodic
+*)
 Theorem ZWf_mod_add_l : forall (f : Z->Z) (u v : Z),
   v = 0 \/ v = 1 \/ v = 2 \/ v = 3 ->
   (Wf f (4*u + v)) = (Wf f v).
 Proof.
-  intros f u v H.
+  intros.
   unfold Wf. unfold W.
   rewrite Zj_mod_add.
   rewrite Zk_mod_add.
@@ -320,11 +320,15 @@ Proof.
   reflexivity.
 Qed.
 
+(*
+  Deconvolutes f(t, v) => a + b*f(t)*i(v) + c*f(t)*j(v) + d*f(t)*k(v)
+  when f(t,v) is periodic when t or v is held constant.
+*)
 Theorem ZWff_mod_add_l : forall (f : Z->Z->Z) (t u v : Z),
   v = 0 \/ v = 1 \/ v = 2 \/ v = 3 ->
   (Wf (f t) (4*u + v)) = (Wf (f t) v).
 Proof.
-  intros f t u v H.
+  intros.
   unfold Wf. unfold W.
   rewrite Zj_mod_add.
   rewrite Zk_mod_add.
@@ -332,6 +336,9 @@ Proof.
   reflexivity.
 Qed.
 
+(*
+  Proves that repeated application eliminates other applications
+*)
 Theorem ZWf_Wf_l : forall (f : Z->Z) (u v : Z),
   v = 0 \/ v = 1 \/ v = 2 \/ v = 3 ->
   (Wf (Wf f) (4*u + v)) = (Wf f v).
@@ -340,13 +347,16 @@ Proof.
   rewrite ZWf_mod_add_l.
   unfold Wf. repeat unfold W. unfold k. unfold j. unfold i.
   destruct H as [H0 | [H1 | [H2 | H3]]].
-  - subst. simpl. zify. lia.
-  - subst. simpl. zify. lia.
-  - subst. simpl. zify. lia.
-  - subst. simpl. zify. lia.
-  - lia.
+  - subst. simpl. lia.
+  - subst. simpl. lia.
+  - subst. simpl. lia.
+  - subst. simpl. lia.
+  - assumption.
 Qed.
 
+(*
+  Proves that repeated application eliminates other applications
+*)
 Theorem ZWf_Wff_l : forall (f : Z->Z->Z) (t u v : Z),
   v = 0 \/ v = 1 \/ v = 2 \/ v = 3 ->
   (Wf (Wf (f t)) (4*u + v)) = (Wf (f t) v).
@@ -355,11 +365,11 @@ Proof.
   rewrite ZWf_mod_add_l.
   unfold Wf. repeat unfold W. unfold k. unfold j. unfold i.
   destruct H as [H0 | [H1 | [H2 | H3]]].
-  - subst. simpl. zify. lia.
-  - subst. simpl. zify. lia.
-  - subst. simpl. zify. lia.
-  - subst. simpl. zify. lia.
-  - lia.
+  - subst. simpl. lia.
+  - subst. simpl. lia.
+  - subst. simpl. lia.
+  - subst. simpl. lia.
+  - assumption.
 Qed.
 
 Theorem ZWf_Wf_add_l : forall (g f : Z->Z) (u v : Z),
@@ -370,11 +380,11 @@ Proof.
   rewrite ZWf_mod_add_l.
   unfold zip. unfold Wf. repeat unfold W. unfold k. unfold j. unfold i.
   destruct H as [H0 | [H1 | [H2 | H3]]].
-  - subst. simpl. zify. lia.
-  - subst. simpl. zify. lia.
-  - subst. simpl. zify. lia.
-  - subst. simpl. zify. lia.
-  - lia.
+  - subst. simpl. lia.
+  - subst. simpl. lia.
+  - subst. simpl. lia.
+  - subst. simpl. lia.
+  - assumption.
 Qed.
 
 Theorem ZWf_Wff_add_l : forall (g f : Z->Z->Z) (t u v : Z),
@@ -385,12 +395,13 @@ Proof.
   rewrite ZWf_mod_add_l.
   unfold zip. unfold Wf. repeat unfold W. unfold k. unfold j. unfold i.
   destruct H as [H0 | [H1 | [H2 | H3]]].
-  - subst. simpl. zify. lia.
-  - subst. simpl. zify. lia.
-  - subst. simpl. zify. lia.
-  - subst. simpl. zify. lia.
-  - lia.
+  - subst. simpl. lia.
+  - subst. simpl. lia.
+  - subst. simpl. lia.
+  - subst. simpl. lia.
+  - assumption.
 Qed.
+
 
 Theorem ZWf_if_l : forall (u v : Z),
   v = 0 \/ v = 1 \/ v = 2 \/ v = 3 ->
@@ -400,11 +411,11 @@ Proof.
   rewrite ZWf_mod_add_l.
   unfold Wf. unfold W. unfold k. unfold j. unfold i.
   destruct H as [H0 | [H1 | [H2 | H3]]].
-  - subst. simpl. zify. lia.
-  - subst. simpl. zify. lia.
-  - subst. simpl. zify. lia.
-  - subst. simpl. zify. lia.
-  - lia.
+  - subst. simpl. lia.
+  - subst. simpl. lia.
+  - subst. simpl. lia.
+  - subst. simpl. lia.
+  - assumption.
 Qed.
 
 Theorem ZWf_jf_l : forall (u v : Z),
@@ -415,11 +426,11 @@ Proof.
   rewrite ZWf_mod_add_l.
   unfold Wf. unfold W. unfold k. unfold j. unfold i.
   destruct H as [H0 | [H1 | [H2 | H3]]].
-  - subst. simpl. zify. lia.
-  - subst. simpl. zify. lia.
-  - subst. simpl. zify. lia.
-  - subst. simpl. zify. lia.
-  - lia.
+  - subst. simpl. lia.
+  - subst. simpl. lia.
+  - subst. simpl. lia.
+  - subst. simpl. lia.
+  - assumption.
 Qed.
 
 Theorem ZWf_kf_l : forall (u v : Z),
@@ -430,9 +441,9 @@ Proof.
   rewrite ZWf_mod_add_l.
   unfold Wf. unfold W. unfold k. unfold j. unfold i.
   destruct H as [H0 | [H1 | [H2 | H3]]].
-  - subst. simpl. zify. lia.
-  - subst. simpl. zify. lia.
-  - subst. simpl. zify. lia.
-  - subst. simpl. zify. lia.
-  - lia.
+  - subst. simpl. lia.
+  - subst. simpl. lia.
+  - subst. simpl. lia.
+  - subst. simpl. lia.
+  - assumption.
 Qed.

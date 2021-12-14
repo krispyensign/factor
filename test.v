@@ -15,7 +15,12 @@ Definition W (a : Z) (b : Z) (c : Z) (d : Z) (x : Z) :=
 	(a - b + c - d)*i(x) +
 	(a + b - c - d)*j(x) +
 	(a - b - c + d)*k(x))/4.
-
+Definition Wf (f : Z -> Z) (x : Z) :=
+	let a := f(0) in
+	let b := f(1) in
+	let c := f(2) in
+	let d := f(3) in
+	(W a b c d x).
 
 Lemma Zmod_add_r : forall a b c, c <> 0 -> (c * b + a) mod c = a mod c.
 Proof.
@@ -280,5 +285,121 @@ Proof.
 	- destruct H1. subst. simpl. zify. lia.
 	- destruct H2. subst. simpl. zify. lia.
 	- destruct H3. subst. simpl. zify. lia.
+	- lia.
+Qed.
+
+
+Theorem ZWf_eq : forall (f : Z->Z) (v w : Z),
+	(v = 0 /\ w = f(0)) \/
+	(v = 1 /\ w = f(1)) \/
+	(v = 2 /\ w = f(2)) \/
+	(v = 3 /\ w = f(3)) ->
+	(Wf f v) = w.
+Proof.
+	intros f v w H.
+	unfold Wf. unfold W. unfold k. unfold j. unfold i.
+	destruct H as [H0 | [H1 | [H2 | H3]]].
+	- destruct H0. subst. simpl. zify. lia.
+	- destruct H1. subst. simpl. zify. lia.
+	- destruct H2. subst. simpl. zify. lia.
+	- destruct H3. subst. simpl. zify. lia.
+Qed.
+
+Theorem ZWf_mod_add_l : forall (f : Z->Z) (u v : Z),
+	v = 0 \/ v = 1 \/ v = 2 \/ v = 3 ->
+	(Wf f (4*u + v)) = (Wf f v).
+Proof.
+	intros f u v H.
+	unfold Wf. unfold W.
+	rewrite Zj_mod_add.
+	rewrite Zk_mod_add.
+	rewrite Zi_mod_add_4.
+	reflexivity.
+Qed.
+
+Theorem ZWff_mod_add_l : forall (f : Z->Z->Z) (t u v : Z),
+	v = 0 \/ v = 1 \/ v = 2 \/ v = 3 ->
+	(Wf (f t) (4*u + v)) = (Wf (f t) v).
+Proof.
+	intros f t u v H.
+	unfold Wf. unfold W.
+	rewrite Zj_mod_add.
+	rewrite Zk_mod_add.
+	rewrite Zi_mod_add_4.
+	reflexivity.
+Qed.
+
+Theorem ZWf_Wf_l : forall (f : Z->Z) (u v w : Z),
+	v = 0 \/ v = 1 \/ v = 2 \/ v = 3 ->
+	(Wf (Wf f) (4*u + v)) = (Wf f v).
+Proof.
+	intros.
+	rewrite ZWf_mod_add_l.
+	unfold Wf. unfold W. unfold W. unfold k. unfold j. unfold i.
+	destruct H as [H0 | [H1 | [H2 | H3]]].
+	- subst. simpl. zify. lia.
+	- subst. simpl. zify. lia.
+	- subst. simpl. zify. lia.
+	- subst. simpl. zify. lia.
+	- lia.
+Qed.
+
+Theorem ZWf_Wff_l : forall (f : Z->Z->Z) (t u v w : Z),
+	v = 0 \/ v = 1 \/ v = 2 \/ v = 3 ->
+	(Wf (Wf (f t)) (4*u + v)) = (Wf (f t) v).
+Proof.
+	intros.
+	rewrite ZWf_mod_add_l.
+	unfold Wf. unfold W. unfold W. unfold k. unfold j. unfold i.
+	destruct H as [H0 | [H1 | [H2 | H3]]].
+	- subst. simpl. zify. lia.
+	- subst. simpl. zify. lia.
+	- subst. simpl. zify. lia.
+	- subst. simpl. zify. lia.
+	- lia.
+Qed.
+
+Theorem ZWf_if_l : forall (u v w : Z),
+	v = 0 \/ v = 1 \/ v = 2 \/ v = 3 ->
+	(Wf i (4*u + v)) = (i v).
+Proof.
+	intros.
+	rewrite ZWf_mod_add_l.
+	unfold Wf. unfold W. unfold k. unfold j. unfold i.
+	destruct H as [H0 | [H1 | [H2 | H3]]].
+	- subst. simpl. zify. lia.
+	- subst. simpl. zify. lia.
+	- subst. simpl. zify. lia.
+	- subst. simpl. zify. lia.
+	- lia.
+Qed.
+
+Theorem ZWf_jf_l : forall (u v w : Z),
+	v = 0 \/ v = 1 \/ v = 2 \/ v = 3 ->
+	(Wf j (4*u + v)) = (j v).
+Proof.
+	intros.
+	rewrite ZWf_mod_add_l.
+	unfold Wf. unfold W. unfold k. unfold j. unfold i.
+	destruct H as [H0 | [H1 | [H2 | H3]]].
+	- subst. simpl. zify. lia.
+	- subst. simpl. zify. lia.
+	- subst. simpl. zify. lia.
+	- subst. simpl. zify. lia.
+	- lia.
+Qed.
+
+Theorem ZWf_kf_l : forall (u v w : Z),
+	v = 0 \/ v = 1 \/ v = 2 \/ v = 3 ->
+	(Wf k (4*u + v)) = (k v).
+Proof.
+	intros.
+	rewrite ZWf_mod_add_l.
+	unfold Wf. unfold W. unfold k. unfold j. unfold i.
+	destruct H as [H0 | [H1 | [H2 | H3]]].
+	- subst. simpl. zify. lia.
+	- subst. simpl. zify. lia.
+	- subst. simpl. zify. lia.
+	- subst. simpl. zify. lia.
 	- lia.
 Qed.

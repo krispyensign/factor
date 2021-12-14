@@ -7,20 +7,15 @@ Local Open Scope Z_scope.
 Ltac Zify.zify_post_hook ::= Z.div_mod_to_equations.
 
 
-Definition i x := 1 - 2*(x mod 2).
-Definition j x := - (x mod 4) + (1 - (i x))/2 + 1.
-Definition k x := (j (x + 1)).
-Definition W a b c d x :=
+Definition i n := 1 - 2*(n mod 2).
+Definition j n := - (n mod 4) + (1 - (i n))/2 + 1.
+Definition k n := (j (n + 1)).
+Definition W a b c d n :=
   ((a + b + c + d) +
-  (a - b + c - d)*(i x) +
-  (a + b - c - d)*(j x) +
-  (a - b - c + d)*(k x))/4.
-Definition Wf (f : Z->Z) (x : Z) :=
-  let a := (f 0) in
-  let b := (f 1) in
-  let c := (f 2) in
-  let d := (f 3) in
-  (W a b c d x).
+  (a - b + c - d)*(i n) +
+  (a + b - c - d)*(j n) +
+  (a - b - c + d)*(k n))/4.
+Definition Wf (f : Z->Z) (n : Z) := (W (f 0) (f 1) (f 2) (f 3) n).
 
 Definition zip (f g : Z->Z) (n : Z) :=
   (f n) + (g n).

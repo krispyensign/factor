@@ -16,9 +16,7 @@ Definition W a b c d n :=
   (a + b - c - d)*(j n) +
   (a - b - c + d)*(k n))/4.
 Definition Wf (f : Z->Z) (n : Z) := (W (f 0) (f 1) (f 2) (f 3) n).
-
-Definition zip (f g : Z->Z) (n : Z) :=
-  (f n) + (g n).
+Definition zip (f g : Z->Z) (n : Z) := (f n) + (g n).
 
 
 Lemma Zmod_add_r : forall a b c, c <> 0 -> (c * b + a) mod c = a mod c.

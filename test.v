@@ -51,7 +51,6 @@ Proof.
   discriminate.
 Qed.
 
-
 Theorem Zi_mod_add_4 : forall a b, (i (4*a + b)) = (i b).
 Proof.
   intros.
@@ -75,14 +74,13 @@ Proof.
 Qed.
 
 
-Theorem Zi_pow_2_r : forall a b, b = 0 \/ b = 1 -> (i (2*a + b)) ^ 2 = 1.
+Theorem Zi_pow_2_r : forall a b, 0 <= b < 2 -> (i (2*a + b)) ^ 2 = 1.
 Proof.
   intros.
-  destruct H.
-  - subst. rewrite Zi_mod_add. auto.
-  - subst. rewrite Zi_mod_add. auto.
+  rewrite Zi_mod_add.
+  unfold i.
+  nia.
 Qed.
-
 
 Theorem Zj_mod_add : forall a b, (j (4*a + b)) = (j b).
 Proof.
@@ -117,16 +115,14 @@ Qed.
 
 
 Theorem Zj_pow_2_r : forall a b,
-  b = 0 \/ b = 1 \/ b = 2 \/ b = 3 ->
+  0 <= b < 4 ->
   (j (4*a + b))^2 = 1.
 Proof.
   intros.
   rewrite Zj_mod_add.
-  destruct H as [b0 | [b1 | [b2 | b3]]].
-  - subst. auto.
-  - subst. auto.
-  - subst. auto.
-  - subst. auto.
+  unfold j.
+  unfold i.
+  nia.
 Qed.
 
 

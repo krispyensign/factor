@@ -329,7 +329,7 @@ Qed.
   Proves that repeated application eliminates other applications
 *)
 Theorem ZWf_Wf_l : forall (f : Z->Z) (u v : Z),
-  0 <= v < 4 ->  
+  0 <= v < 4 ->
   (Wf (Wf f) (4*u + v)) = (Wf f v).
 Proof.
   intros.
@@ -342,7 +342,7 @@ Qed.
   Proves that repeated application eliminates other applications
 *)
 Theorem ZWf_Wff_l : forall (f : Z->Z->Z) (t u v : Z),
-  0 <= v < 4 ->  
+  0 <= v < 4 ->
   (Wf (Wf (f t)) (4*u + v)) = (Wf (f t) v).
 Proof.
   intros.
@@ -352,7 +352,7 @@ Proof.
 Qed.
 
 Theorem ZWf_Wf_add_l : forall (g f : Z->Z) (u v : Z),
-  0 <= v < 4 ->  
+  0 <= v < 4 ->
   (Wf (zip g (Wf f)) (4*u + v)) = (Wf (zip g f) v).
 Proof.
   intros.
@@ -372,7 +372,7 @@ Qed.
 
 
 Theorem ZWf_Wff_add_l : forall (g f : Z->Z->Z) (t u v : Z),
-  0 <= v < 4 ->  
+  0 <= v < 4 ->
   (Wf (zip (g t) (Wf (f t))) (4*u + v)) = (Wf (zip (g t) (f t)) v).
 Proof.
   intros.
@@ -392,46 +392,37 @@ Qed.
 
 
 Theorem ZWf_if_l : forall (u v : Z),
-  v = 0 \/ v = 1 \/ v = 2 \/ v = 3 ->
+  0 <= v < 4 ->
   (Wf i (4*u + v)) = (i v).
 Proof.
   intros.
   rewrite ZWf_mod_add_l.
-  unfold Wf. unfold W. unfold k. unfold j. unfold i.
-  destruct H as [H0 | [H1 | [H2 | H3]]].
-  - subst. simpl. lia.
-  - subst. simpl. lia.
-  - subst. simpl. lia.
-  - subst. simpl. lia.
-  - assumption.
+  unfold Wf.
+  rewrite ZW_eq with (w := (i v)).
+  - reflexivity.
+  - unfold i. lia.
 Qed.
 
 Theorem ZWf_jf_l : forall (u v : Z),
-  v = 0 \/ v = 1 \/ v = 2 \/ v = 3 ->
+  0 <= v < 4 ->
   (Wf j (4*u + v)) = (j v).
 Proof.
   intros.
   rewrite ZWf_mod_add_l.
-  unfold Wf. unfold W. unfold k. unfold j. unfold i.
-  destruct H as [H0 | [H1 | [H2 | H3]]].
-  - subst. simpl. lia.
-  - subst. simpl. lia.
-  - subst. simpl. lia.
-  - subst. simpl. lia.
-  - assumption.
+  unfold Wf.
+  rewrite ZW_eq with (w := (j v)).
+  - reflexivity.
+  - unfold j. unfold i. lia.
 Qed.
 
 Theorem ZWf_kf_l : forall (u v : Z),
-  v = 0 \/ v = 1 \/ v = 2 \/ v = 3 ->
+  0 <= v < 4 ->
   (Wf k (4*u + v)) = (k v).
 Proof.
   intros.
   rewrite ZWf_mod_add_l.
-  unfold Wf. unfold W. unfold k. unfold j. unfold i.
-  destruct H as [H0 | [H1 | [H2 | H3]]].
-  - subst. simpl. lia.
-  - subst. simpl. lia.
-  - subst. simpl. lia.
-  - subst. simpl. lia.
-  - assumption.
+  unfold Wf.
+  rewrite ZW_eq with (w := (k v)).
+  - reflexivity.
+  - unfold k. unfold j. unfold i. lia.
 Qed.

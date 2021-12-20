@@ -426,3 +426,39 @@ Proof.
   - reflexivity.
   - unfold k. unfold j. unfold i. lia.
 Qed.
+
+
+Theorem Zi_add_l : forall a b, 
+  0 <= a < 4 ->
+  0 <= b < 4 ->
+(i (a + b)) = (i a)*(i b).
+Proof.
+  intros.
+  unfold i.
+  nia.
+Qed.
+
+
+Theorem Zj_add_l : forall a b,
+  0 <= a < 4 ->
+  0 <= b < 4 ->
+(j (a + b)) = (W (j a) (k a) (-(j a)) (-(k a)) b).
+Proof.
+  intros.
+  symmetry.
+  rewrite ZW_eq with (w := (j (a + b))).
+  - reflexivity.
+  - unfold k. unfold j. unfold i. lia.
+Qed.
+
+Theorem Zk_add_l : forall a b,
+  0 <= a < 4 ->
+  0 <= b < 4 ->
+  (k (a + b)) = (W (k a) (-(j a)) (-(k a)) (j a) b).
+Proof.
+  intros.
+  symmetry.
+  rewrite ZW_eq with (w := (k (a + b))).
+  - reflexivity.
+  - unfold k. unfold j. unfold i. lia.
+Qed.

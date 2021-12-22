@@ -78,6 +78,70 @@ Proof.
   nia.
 Qed.
 
+
+Theorem Zi_add_1_l : forall a, a = 0 \/ a = 1 -> (i (a + 1)) = -(i a).
+Proof.
+  intros.
+  unfold i.
+  lia.
+Qed.
+
+
+Theorem Zi_add_l : forall a b, (i (a + b)) = (i a)*(i b).
+Proof.
+  intros.
+  unfold i.
+  nia.
+Qed.
+
+
+Theorem Zi_sub_l : forall a b, (i (a - b)) = (i a)*(i b).
+Proof.
+  intros.
+  unfold i.
+  nia.
+Qed.
+
+
+Theorem Zi_i_l : forall a,
+  (i (i a)) = (-1).
+Proof.
+  intros.
+  unfold i.
+  lia.
+Qed.
+
+
+Theorem Zi_expr_1 : forall a, (i (2*a + ((i a) + 1)/2)) = -(i a).
+Proof.
+  intros.
+  unfold i.
+  lia.
+Qed.
+
+Theorem Zi_expr_2 : forall a b, (i (a - (i b) + 1)) = (i a).
+Proof.
+  intros.
+  unfold i.
+  lia.
+Qed.
+
+Theorem Zi_expr_3 : forall a, (i ((2*a + (1 - (i a))/2))) = (i a).
+Proof.
+  intros.
+  unfold i.
+  lia.
+Qed.
+
+
+Theorem Zi_expr_4 : forall a b, (i (a + ((i b) + 1)/2)) = -(i a)*(i b).
+Proof.
+  intros.
+  unfold i.
+  nia.
+Qed.
+
+
 Theorem Zj_mod_add : forall a b, (j (4*a + b)) = (j b).
 Proof.
   intros.
@@ -164,67 +228,6 @@ Proof.
   nia.
 Qed.
 
-
-Theorem Zi_add_1_l : forall a, a = 0 \/ a = 1 -> (i (a + 1)) = -(i a).
-Proof.
-  intros.
-  unfold i.
-  lia.
-Qed.
-
-
-Theorem Zi_add_l : forall a b, (i (a + b)) = (i a)*(i b).
-Proof.
-  intros.
-  unfold i.
-  nia.
-Qed.
-
-
-Theorem Zi_sub_l : forall a b, (i (a - b)) = (i a)*(i b).
-Proof.
-  intros.
-  unfold i.
-  nia.
-Qed.
-
-Theorem Zi_i_l : forall a,
-  (i (i a)) = (-1).
-Proof.
-  intros.
-  unfold i.
-  lia.
-Qed.
-
-
-Theorem Zi_expr_1 : forall a, (i (2*a + ((i a) + 1)/2)) = -(i a).
-Proof.
-  intros.
-  unfold i.
-  lia.
-Qed.
-
-Theorem Zi_expr_2 : forall a b, (i (a - (i b) + 1)) = (i a).
-Proof.
-  intros.
-  unfold i.
-  lia.
-Qed.
-
-Theorem Zi_expr_3 : forall a, (i ((2*a + (1 - (i a))/2))) = (i a).
-Proof.
-  intros.
-  unfold i.
-  lia.
-Qed.
-
-
-Theorem Zi_expr_4 : forall a b, (i (a + ((i b) + 1)/2)) = -(i a)*(i b).
-Proof.
-  intros.
-  unfold i.
-  nia.
-Qed.
 
 
 Theorem Zj_mul_add_1_l : forall a, (j (2*a + 1)) = (i a).

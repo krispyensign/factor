@@ -3,7 +3,6 @@ from sympy import (  # type: ignore
     Mod,
     symbols,
     pprint,
-    Add,
     Integer,
     Symbol,
     I,
@@ -11,7 +10,9 @@ from sympy import (  # type: ignore
 )
 
 from typing import Tuple
-from core import w1
+
+from sympy.core.expr import Expr
+from core import w1, w2, w3
 
 from utils import matrix_print, sep_print
 
@@ -19,7 +20,7 @@ from utils import matrix_print, sep_print
 class Functor:
     x: Symbol
     y: Symbol
-    f: Add
+    f: Expr
 
     def __init__(self, z) -> None:
         self.x, self.y = symbols('x y')
@@ -79,7 +80,7 @@ class Functor:
         # generate the m x m (default = 4 x 4) binary matrix
         return [[Integer(Mod(self.f, n).subs({self.x: i, self.y: j})) for i in range(m)] for j in range(m)]
 
-    def lift(self, flip_rotation: bool) -> Tuple[Add, bool, bool, dict[Symbol, Add]]:
+    def lift(self, flip_rotation: bool) -> Tuple[Expr, bool, bool, dict[Symbol, Expr]]:
         # perform pattern match to get the subexpression and various flags
         do_division, sub_expression, is_rotated = self.matcher(
             self.gen_matrix(), flip_rotation)
@@ -96,27 +97,33 @@ class Functor:
 
         return f, do_division, is_rotated, sub_expression
 
-    def smooth(self) -> Add:
+    def smooth(self) -> Expr:
         w1x : Symbol = symbols('w1x')
         w1y : Symbol = symbols('w1y')
         # replace complicated exponents with simpler isomorphic exponents over the integers
-        return self.f.xreplace({
+        return self.f.expand().xreplace({
             w1(self.x)**2: 1,
+            w2(self.x)**2: 1,
+            w3(self.x)**2: 1,
+            
             w1(self.x)**3: w1(self.x),
-
+            w2(self.x)**3: w2(self.x),
+            w3(self.x)**3: w3(self.x),
+            
             w1(self.y)**2: 1,
+            w2(self.y)**2: 1,
+            w3(self.y)**2: 1,
+
             w1(self.y)**3: w1(self.y),
-
-            w1(2*self.x + 1):   -1,
-
-            w1(2*self.y + 1):   -1,
-        }).expand()
+            w2(self.y)**3: w2(self.y),
+            w3(self.y)**3: w3(self.y),
+        })
 
     def matcher(
         self,
         m: list[list[Integer]],
         flip_rotation: bool,
-    ) -> Tuple[bool, dict[Symbol, Add], bool]:
+    ) -> Tuple[bool, dict[Symbol, Expr], bool]:
         # setup rotation
         rotator = {self.x: self.x + self.y}
         if flip_rotation is True:

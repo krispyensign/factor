@@ -25,8 +25,6 @@ class w1(Function):
     """Walsh[1] function"""
     @classmethod
     def eval(cls, n: Expr) -> int | Function:
-        if n.is_Add:
-            pprint(n.as_two_terms())
         if n.is_Symbol:
             return
         elif n.is_Integer:
@@ -40,9 +38,9 @@ class w1(Function):
         elif n in [2*x + 2, 2*y + 2]:
             return 1
         elif n == 2*x + w1(x)/2 + Rational(1/2): # Zi_expr_1
-            return w1(x + 1)
+            return -w1(x)
         elif n == 2*y + w1(y)/2 + Rational(1/2): # Zi_expr_1
-            return w1(y + 1)
+            return -w1(y)
         elif n == x - w1(y) + Rational(1): #Zi_expr_2
             return w1(x)
         elif n == y - w1(x) + Rational(1): #Zi_expr_2
@@ -51,14 +49,18 @@ class w1(Function):
             return w1(x)
         elif n == 2*y - w1(y)/2 + Rational(1/2): # Zi_expr_3
             return w1(y)
+        elif n == 2*x + w1(x)/2 - Rational(1/2):
+            return w1(x)
+        elif n == 2*y + w1(y)/2 - Rational(1/2):
+            return w1(y)
         elif n == x + y: # Zi_add_l
             return w1(x)*w1(y)
-        elif n == x + w1(y)/2 + Rational(1/2):
-            return w1(x)*w1(y + 1)
-        elif n == y + w1(x)/2 + Rational(1/2):
-            return w1(x)*w1(y + 1)
+        elif n == x + w1(y)/2 + Rational(1/2): #Zi_expr_4
+            return -w1(x)*w1(y)
+        elif n == y + w1(x)/2 + Rational(1/2): #Zi_expr_4
+            return -w1(x)*w1(y)
         elif n == x + y + 1:
-            return w1(x)*w1(y + 1)
+            return -w1(x)*w1(y)
 
 
 class w2(Function):
@@ -106,17 +108,18 @@ def condense_terms_c(f: Add) -> Add:
 def walsh_reduction(f: Add) -> Add:
     # perform reduction of walsh function args
     return f.expand().subs({
-        w1(y)**2: 1,
         w1(x)**2: 1,
         w2(x)**2: 1,
-        w2(y)**2: 1,
         w3(x)**2: 1,
+
+        w1(y)**2: 1,
+        w2(y)**2: 1,
         w3(y)**2: 1,
-        w1(2*y): 1,
-        w1(2*x): 1,
+
         w2(2*x): w1(x),
-        w2(2*y): w1(y),
         w3(2*x): w1(x),
+
+        w2(2*y): w1(y),
         w3(2*y): w1(y),
     })
 

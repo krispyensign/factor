@@ -55,10 +55,6 @@ Theorem Zi_mod_add_4 : forall a b, (i (4*a + b)) = (i b).
 Proof.
   intros.
   unfold i.
-  replace (4*a) with (2*(2*a)).
-  rewrite Zmod_add_r.
-  reflexivity.
-  discriminate.
   lia.
 Qed.
 
@@ -68,9 +64,9 @@ Theorem Zi_eq : forall a b c,
   (i (2*a + b)) = c.
 Proof.
   intros.
-  destruct H as [(b0, c0) | (b1, c1)].
-  - subst. rewrite Zi_mod_add. auto.
-  - subst. rewrite Zi_mod_add. auto.
+  rewrite Zi_mod_add.
+  unfold i.
+  lia.
 Qed.
 
 
@@ -88,12 +84,8 @@ Proof.
   unfold j.
   rewrite Zmod_add_r.
   unfold i.
-  replace (4) with (2 * 2).
-  rewrite Zmod_mul_add.
-  - reflexivity.
-  - discriminate.
-  - simpl. reflexivity.
-  - discriminate.
+  lia.
+  discriminate.
 Qed.
 
 
@@ -106,11 +98,9 @@ Theorem Zj_eq : forall a b c,
 Proof.
   intros.
   rewrite Zj_mod_add.
-  destruct H as [(b0, c0) | [(b1, c1) | [(b2, c2) | (b3, c3)]]].
-  - subst. auto.
-  - subst. auto.
-  - subst. auto.
-  - subst. auto.
+  unfold j.
+  unfold i.
+  lia.
 Qed.
 
 
@@ -157,11 +147,10 @@ Theorem Zk_eq : forall a b c,
 Proof.
   intros.
   rewrite Zk_mod_add.
-  destruct H as [(b0, c0) | [(b1, c1) | [(b2, c2) | (b3, c3)]]].
-  - subst. auto.
-  - subst. auto.
-  - subst. auto.
-  - subst. auto.
+  unfold k.
+  unfold j.
+  unfold i.
+  nia.
 Qed.
 
 
@@ -176,12 +165,11 @@ Proof.
 Qed.
 
 
-Theorem Zi_add_1_l : forall a, a = 0 \/ a = 1 -> (i (a + 1)) = (-(i a)).
+Theorem Zi_add_1_l : forall a, a = 0 \/ a = 1 -> (i (a + 1)) = -(i a).
 Proof.
   intros.
-  destruct H.
-  - subst. auto.
-  - subst. auto.
+  unfold i.
+  lia.
 Qed.
 
 
@@ -209,24 +197,11 @@ Proof.
 Qed.
 
 
-Theorem Zi_expr_1 : forall a, (i (2*a + ((i a)/2) + 1/2)) = (i (a + 1)).
+Theorem Zi_expr_1 : forall a, (i (2*a + ((i a) + 1)/2)) = -(i a).
 Proof.
   intros.
-  rewrite <- Z.add_assoc.
-  rewrite Zi_eq with (c := (i (a + 1))).
-  reflexivity.
-  left.
-  split.
-  replace a with 1.
   unfold i.
-  rewrite Z.mod_small.
-  rewrite Z.mul_1_r.
-  replace (1 - 2) with (-1).
-  replace ((-1)/2 + 1/2) with ((-1 + 1)/2).
   lia.
-  unfold i.
-  replace (((1 - 2 * (a mod 2)) / 2 + 1 / 2)) with (1 - 2 * (a mod 2)).
-  rewrite Z.mod_mod.
 Qed.
 
 Theorem Zi_expr_2 : forall a b, (i (a - (i b) + 1)) = (i a).
@@ -236,7 +211,7 @@ Proof.
   lia.
 Qed.
 
-Theorem Zi_expr_3 : forall a, (i ((2*a - (i a)/2 + 1/2))) = (i a).
+Theorem Zi_expr_3 : forall a, (i ((2*a + (1 - (i a))/2))) = (i a).
 Proof.
   intros.
   unfold i.
@@ -244,11 +219,11 @@ Proof.
 Qed.
 
 
-Theorem Zi_expr_4 : forall a b, (i (a + (i b)/2 + 1/2)) = (i a)*(i (b + 1)).
+Theorem Zi_expr_4 : forall a b, (i (a + ((i b) + 1)/2)) = -(i a)*(i b).
 Proof.
   intros.
   unfold i.
-  lia.
+  nia.
 Qed.
 
 

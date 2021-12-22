@@ -5,9 +5,6 @@ from utils import matrix_print
 if __name__ == "__main__":
     # initialize everything
     N = 313 * 107
-    # N = 313 * 107
-    # N = 313 * 223
-    # N = 91
     x, y = symbols('x,y')
     fn = Functor(N)
     bits = 0

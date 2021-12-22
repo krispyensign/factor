@@ -9,7 +9,7 @@ if __name__ == "__main__":
     # N = 313 * 223
     # N = 91
     x, y = symbols('x,y')
-    fn = Functor(x**2 - y**2 - N)
+    fn = Functor(N)
     bits = 0
     rotation = False
     matchFailure = False
@@ -20,7 +20,7 @@ if __name__ == "__main__":
         print("Iteration: " + str(i))
         print("Bits reduced: " + str(bits))
         print("Sqrt N bits: " + str(len(bin(int(N**(1/2))))))
-        fn.print()
+        fn.print(print_full=True)
         if bits >= len(bin(int(N**(1/2)))):
             break
 

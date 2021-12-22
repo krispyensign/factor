@@ -1,4 +1,5 @@
 from sympy import (  # type: ignore
+    SYMPY_DEBUG,
     Mod,
     symbols,
     pprint,
@@ -10,6 +11,7 @@ from sympy import (  # type: ignore
 )
 
 from typing import Tuple
+from core import w1
 
 from utils import matrix_print, sep_print
 
@@ -95,33 +97,20 @@ class Functor:
         return f, do_division, is_rotated, sub_expression
 
     def smooth(self) -> Add:
+        w1x : Symbol = symbols('w1x')
+        w1y : Symbol = symbols('w1y')
         # replace complicated exponents with simpler isomorphic exponents over the integers
-        return self.f.expand().subs({
-            I**(4*self.x):              1,
-            I**(4*self.y):              1,
-            I**(8*self.x):              1,
-            I**(8*self.y):              1,
-            I**(12*self.x):             1,
-            I**(12*self.y):             1,
-            I**(16*self.x):             1,
-            I**(16*self.y):             1,
-            I**(8*self.x + 4):          1,
-            I**(8*self.y + 4):          1,
-            I**(4*self.x + 2): -1,
-            I**(4*self.y + 2): -1,
+        return self.f.xreplace({
+            w1(self.x)**2: 1,
+            w1(self.x)**3: w1(self.x),
 
-            I**(6*self.y):              I**(2*self.y),
-            I**(6*self.x):              I**(2*self.x),
+            w1(self.y)**2: 1,
+            w1(self.y)**3: w1(self.y),
 
-            I**(-2*I**(2*self.x)): -1,
-            I**(-2*I**(2*self.y)): -1,
+            w1(2*self.x + 1):   -1,
 
-            I*I**(-I**(2*self.x)):      I**(2*self.x),
-            I*I**(-I**(2*self.y)):      I**(2*self.y),
-
-            I*I**(I**(2*self.x)):             I**(2*self.x + 2),
-            I*I**(I**(2*self.y)):             I**(2*self.y + 2),
-        })
+            w1(2*self.y + 1):   -1,
+        }).expand()
 
     def matcher(
         self,
@@ -170,49 +159,49 @@ class Functor:
                    [0, 0, 1, 1],
                    [0, 0, 1, 1],
                    [0, 0, 1, 1]]:
-            return True, {self.x: 2*self.x - (1 - I**(2*self.x)) / 2}, False
+            return True, {self.x: 2*self.x - (1 - w1(self.x)) / 2}, False
 
         elif m == [[1, 0, 0, 1],
                    [1, 0, 0, 1],
                    [1, 0, 0, 1],
                    [1, 0, 0, 1]]:
-            return True, {self.x: 2*self.x - (1 - I**(2*self.x)) / 2 + 1}, False
+            return True, {self.x: 2*self.x - (1 - w1(self.x)) / 2 + 1}, False
 
         elif m == [[1, 1, 0, 0],
                    [1, 1, 0, 0],
                    [1, 1, 0, 0],
                    [1, 1, 0, 0]]:
-            return True, {self.x: 2*self.x - (1 - I**(2*self.x)) / 2 + 2}, False
+            return True, {self.x: 2*self.x - (1 - w1(self.x)) / 2 + 2}, False
 
         elif m == [[0, 1, 1, 0],
                    [0, 1, 1, 0],
                    [0, 1, 1, 0],
                    [0, 1, 1, 0]]:
-            return True, {self.x: 2*self.x + (1 - I**(2*self.x)) / 2}, False
+            return True, {self.x: 2*self.x + (1 - w1(self.x)) / 2}, False
 
         elif m == [[0, 0, 0, 0],
                    [0, 0, 0, 0],
                    [1, 1, 1, 1],
                    [1, 1, 1, 1]]:
-            return True, {self.y: 2*self.y - (1 - I**(2*self.y)) / 2}, False
+            return True, {self.y: 2*self.y - (1 - w1(self.y)) / 2}, False
 
         elif m == [[1, 1, 1, 1],
                    [0, 0, 0, 0],
                    [0, 0, 0, 0],
                    [1, 1, 1, 1]]:
-            return True, {self.y: 2*self.y - (1 - I**(2*self.y)) / 2 + 1}, False
+            return True, {self.y: 2*self.y - (1 - w1(self.y)) / 2 + 1}, False
 
         elif m == [[1, 1, 1, 1],
                    [1, 1, 1, 1],
                    [0, 0, 0, 0],
                    [0, 0, 0, 0]]:
-            return True, {self.y: 2*self.y - (1 - I**(2*self.y)) / 2 + 2}, False
+            return True, {self.y: 2*self.y - (1 - w1(2*self.y)) / 2 + 2}, False
 
         elif m == [[0, 0, 0, 0],
                    [1, 1, 1, 1],
                    [1, 1, 1, 1],
                    [0, 0, 0, 0]]:
-            return True, {self.y: 2*self.y + (1 - I**(2*self.y)) / 2}, False
+            return True, {self.y: 2*self.y + (1 - w1(self.y)) / 2}, False
         # endregion
 
         # region match rotations
@@ -298,7 +287,9 @@ class Functor:
                     [0, 1, 1, 0],
                     [0, 0, 1, 1],
                     [0, 1, 1, 0]]]:
-            return False, {self.x: self.x + (1 - I**(2*self.y + 2)) / 2}, False
+            return False, {self.x: self.x + (1 + w1(self.y)) / 2}, False
+            # [1 2 3 4]
+            # [0 1 2 3]
 
         elif m in [[[1, 1, 0, 0],
                     [0, 0, 1, 1],
@@ -319,7 +310,7 @@ class Functor:
                     [1, 0, 0, 1],
                     [0, 1, 1, 0],
                     [1, 0, 0, 1]]]:
-            return False, {self.x: self.x + 1 - I**(2*self.y)}, False
+            return False, {self.x: self.x + 1 - w1(self.y)}, False
 
         elif m in [[[1, 1, 1, 1],
                     [1, 0, 1, 0],
@@ -340,7 +331,7 @@ class Functor:
                     [0, 0, 0, 0],
                     [0, 1, 0, 1],
                     [1, 1, 1, 1]]]:
-            return False, {self.y: self.y + (1 - I**(2*self.x + 2)) / 2}, False
+            return False, {self.y: self.y + (1 + w1(self.x)) / 2}, False
 
         elif m in [[[1, 1, 1, 1],
                     [0, 1, 0, 1],
@@ -361,7 +352,7 @@ class Functor:
                     [1, 1, 1, 1],
                     [0, 1, 0, 1],
                     [0, 0, 0, 0]]]:
-            return False, {self.y: self.y + (1 - I**(2*self.x)) / 2}, False
+            return False, {self.y: self.y + (1 - w1(self.x)) / 2}, False
 
         elif m in [[[1, 0, 1, 0],
                     [0, 1, 0, 1],
@@ -387,7 +378,7 @@ class Functor:
                     [1, 0, 0, 1],
                     [0, 0, 1, 1],
                     [1, 0, 0, 1]]]:
-            return False, {self.x: self.x + (1 - I**(2*self.y)) / 2}, False
+            return False, {self.x: self.x + (1 - w1(self.y)) / 2}, False
 
         elif m in [[[0, 1, 0, 1],
                     [0, 1, 0, 1],
@@ -408,15 +399,15 @@ class Functor:
                     [0, 1, 0, 1],
                     [0, 1, 0, 1],
                     [1, 0, 1, 0]]]:
-            return False, {self.y: self.y + 1 - I**(2*self.x)}, False
+            return False, {self.y: self.y + 1 - w1(self.x)}, False
         # endregion
 
-        # region match experimental shifting
-        if m == [[0, 1, 1, 0],
-                 [1, 1, 0, 0],
-                 [0, 0, 1, 1],
-                 [0, 1, 1, 0]]:
-            return False, {self.x: self.x + 3*I**(3*self.y)/4 - I**(2*self.y)/2 - I**(3*self.y + 1)/4 + 3*I**self.y/4 + I**(self.y + 1)/4 + 2}, False
+        # # region match experimental shifting
+        # if m == [[0, 1, 1, 0],
+        #          [1, 1, 0, 0],
+        #          [0, 0, 1, 1],
+        #          [0, 1, 1, 0]]:
+        #     return False, {self.x: self.x + 3*I**(3*self.y)/4 - I**(2*self.y)/2 - I**(3*self.y + 1)/4 + 3*I**self.y/4 + I**(self.y + 1)/4 + 2}, False
 
         else:
             raise BaseException("Invalid pattern")

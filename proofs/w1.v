@@ -62,8 +62,7 @@ Proof.
 Qed.
 
 
-Theorem Zi_i_l : forall a,
-  (i (i a)) = (-1).
+Theorem Zi_i_l : forall a, (i (i a)) = (-1).
 Proof.
   intros.
   unfold i.

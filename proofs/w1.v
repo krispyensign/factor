@@ -1,7 +1,7 @@
 Add LoadPath "./proofs/" as proofs.
 Load shared.
 
-Theorem Zi_mod_add : forall x k, (i (2*k + x)) = (i x).
+Theorem Zi_mod_add : forall a b, (i (2*a + b)) = (i b).
 Proof.
   intros. unfold i. rewrite Zmod_add_r.
   - reflexivity.

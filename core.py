@@ -31,35 +31,31 @@ class w1(Function):
             match Mod(n, 2):
                 case 0: return 1
                 case 1: return -1
+        
+        elif n == 2*x + w1(x)/2 + Rational(1/2): # Zi_expr_1
+            return -w1(x)
+        elif n == 2*y + w1(y)/2 + Rational(1/2): # Zi_expr_1
+            return -w1(y)
+        elif n == x + y: # Zi_add_l
+            return w1(x)*w1(y)
+        
         elif n in [2*x, 4*x, 6*x, 2*y, 4*y, 6*y]:
             return 1
         elif n in [2*x + 1, 2*y + 1]:
             return -1
         elif n in [2*x + 2, 2*y + 2]:
             return 1
-        elif n == 2*x + w1(x)/2 + Rational(1/2): # Zi_expr_1
-            return -w1(x)
-        elif n == 2*y + w1(y)/2 + Rational(1/2): # Zi_expr_1
-            return -w1(y)
-        elif n == x - w1(y) + Rational(1): #Zi_expr_2
+        elif n in [x - w1(y) + Rational(1), #Zi_expr_2
+                   2*x - w1(x)/2 + Rational(1/2), # Zi_expr_3
+                   2*x + w1(x)/2 - Rational(1/2)]: # Zi_expr_5
             return w1(x)
-        elif n == y - w1(x) + Rational(1): #Zi_expr_2
+        elif n in [y - w1(x) + Rational(1), #Zi_expr_2
+                   2*y - w1(y)/2 + Rational(1/2), # Zi_expr_3
+                   2*y + w1(y)/2 - Rational(1/2)]: # Zi_expr_5
             return w1(y)
-        elif n == 2*x - w1(x)/2 + Rational(1/2): # Zi_expr_3
-            return w1(x)
-        elif n == 2*y - w1(y)/2 + Rational(1/2): # Zi_expr_3
-            return w1(y)
-        elif n == 2*x + w1(x)/2 - Rational(1/2): # Zi_expr_5
-            return w1(x)
-        elif n == 2*y + w1(y)/2 - Rational(1/2): # Zi_expr_5
-            return w1(y)
-        elif n == x + y: # Zi_add_l
-            return w1(x)*w1(y)
-        elif n == x + w1(y)/2 + Rational(1/2): #Zi_expr_4
-            return -w1(x)*w1(y)
-        elif n == y + w1(x)/2 + Rational(1/2): #Zi_expr_4
-            return -w1(x)*w1(y)
-        elif n == x + y + 1: #zi_add_l
+        elif n in [x + w1(y)/2 + Rational(1/2), #Zi_expr_4
+                   y + w1(x)/2 + Rational(1/2), #Zi_expr_4
+                   x + y + 1]: #zi_add_l
             return -w1(x)*w1(y)
 
 

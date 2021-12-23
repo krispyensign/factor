@@ -27,6 +27,7 @@ class w1(Function):
     def eval(cls, n: Expr) -> int | Function:
         if n.is_Symbol:
             return
+
         elif n.is_Integer:
             match Mod(n, 2):
                 case 0: return 1

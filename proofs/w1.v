@@ -99,3 +99,10 @@ Proof.
   unfold i.
   nia.
 Qed.
+
+Theorem Zi_expr_5 : forall a, (i (2*a + ((i a) - 1)/2)) = (i a).
+Proof.
+  intros.
+  unfold i.
+  lia.
+Qed.

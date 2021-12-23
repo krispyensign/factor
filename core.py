@@ -14,8 +14,8 @@ from sympy import (  # type: ignore
 # define some global symbols
 x: Symbol = symbols('x')
 y: Symbol = symbols('y')
-a: list[Symbol] = symbols(','.join([f"a{ii}" for ii in range(18)]))
-b: list[Symbol] = symbols(','.join([f"b{ii}" for ii in range(18)]))
+a: list[Symbol] = symbols(','.join([f"a{n}" for n in range(18)]))
+b: list[Symbol] = symbols(','.join([f"b{n}" for n in range(18)]))
 c: list[Symbol] = symbols('c0, c1, c2, c3')
 d: list[Symbol] = symbols('d0, d1, d2, d3')
 e: list[Symbol] = symbols('e0, e1, e2, e3')
@@ -49,9 +49,9 @@ class w1(Function):
             return w1(x)
         elif n == 2*y - w1(y)/2 + Rational(1/2): # Zi_expr_3
             return w1(y)
-        elif n == 2*x + w1(x)/2 - Rational(1/2):
+        elif n == 2*x + w1(x)/2 - Rational(1/2): # Zi_expr_5
             return w1(x)
-        elif n == 2*y + w1(y)/2 - Rational(1/2):
+        elif n == 2*y + w1(y)/2 - Rational(1/2): # Zi_expr_5
             return w1(y)
         elif n == x + y: # Zi_add_l
             return w1(x)*w1(y)
@@ -59,7 +59,7 @@ class w1(Function):
             return -w1(x)*w1(y)
         elif n == y + w1(x)/2 + Rational(1/2): #Zi_expr_4
             return -w1(x)*w1(y)
-        elif n == x + y + 1:
+        elif n == x + y + 1: #zi_add_l
             return -w1(x)*w1(y)
 
 
@@ -143,13 +143,13 @@ def hadamard_transform(A: Matrix, v: Symbol) -> Add | Mul:
 
 
 def create_generalized_shift(v: Symbol) -> Add:
-    return condense_terms_c(hadamard_transform(Matrix([[c[ii] for ii in range(4)]]), v)*4)/4
+    return condense_terms_c(hadamard_transform(Matrix([[c[n] for n in range(4)]]), v)*4)/4
 
 
 def encode(coeff: Symbol, shift: Add, v: Symbol, walsh: Function) -> Add:
     return condense_terms_d(
         hadamard_transform(
-            Matrix([[walsh(coeff*shift.subs({v: ii})) for ii in range(4)]]), v)
+            Matrix([[walsh(coeff*shift.subs({v: n})) for n in range(4)]]), v)
     )
 
 

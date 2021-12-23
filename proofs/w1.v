@@ -3,11 +3,9 @@ Load shared.
 
 Theorem Zi_mod_add : forall x k, (i (2*k + x)) = (i x).
 Proof.
-  intros.
-  unfold i.
-  rewrite Zmod_add_r.
-  reflexivity.
-  discriminate.
+  intros. unfold i. rewrite Zmod_add_r.
+  - reflexivity.
+  - discriminate.
 Qed.
 
 Theorem Zi_mod_add_4 : forall a b, (i (4*a + b)) = (i b).

@@ -1,12 +1,16 @@
-from sympy import symbols, I, Rational # type: ignore
+from math import gcd
+from sympy import symbols, I, Rational, pprint # type: ignore
 from functor import Functor
 from utils import matrix_print
+from core import w1
 
 if __name__ == "__main__":
     # initialize everything
-    N = 313 * 107
+    N = 54547 * 24407
     x, y = symbols('x,y')
-    fn = Functor(N)
+    f = x*y - N
+    fn = Functor(f)
+
     bits = 0
     rotation = False
     matchFailure = False
@@ -39,7 +43,8 @@ if __name__ == "__main__":
         fn = Functor(function)
 
     print("Bits reduced: " + str(bits))
-    fn.print(print_full=True)
+    # fn.print(print_full=True)
+    fn.print(print_full=False)
     matrix_print(fn.gen_matrix(m=8))
     if matchFailure == True:
         print("Failed to match.")

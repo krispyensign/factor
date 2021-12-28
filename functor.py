@@ -7,11 +7,11 @@ from sympy import (  # type: ignore
     Symbol,
     I,
     Rational,
+    Expr,
 )
 
 from typing import Tuple
 
-from sympy.core.expr import Expr
 from core import w1, w2, w3
 
 from utils import matrix_print, sep_print
@@ -202,7 +202,7 @@ class Functor:
                    [1, 1, 1, 1],
                    [0, 0, 0, 0],
                    [0, 0, 0, 0]]:
-            return True, {self.y: 2*self.y - (1 - w1(2*self.y)) / 2 + 2}, False
+            return True, {self.y: 2*self.y - (1 - w1(self.y)) / 2 + 2}, False
 
         elif m == [[0, 0, 0, 0],
                    [1, 1, 1, 1],
@@ -271,6 +271,11 @@ class Functor:
                     [0, 0, 1, 1],
                     [1, 0, 0, 1],
                     [1, 1, 0, 0]],
+
+                   [[0, 0, 1, 1],
+                    [0, 1, 1, 0],
+                    [1, 1, 0, 0],
+                    [1, 0, 0, 1]],
 
                    [[1, 0, 0, 1],
                     [0, 0, 1, 1],
@@ -408,13 +413,6 @@ class Functor:
                     [1, 0, 1, 0]]]:
             return False, {self.y: self.y + 1 - w1(self.x)}, False
         # endregion
-
-        # # region match experimental shifting
-        # if m == [[0, 1, 1, 0],
-        #          [1, 1, 0, 0],
-        #          [0, 0, 1, 1],
-        #          [0, 1, 1, 0]]:
-        #     return False, {self.x: self.x + 3*I**(3*self.y)/4 - I**(2*self.y)/2 - I**(3*self.y + 1)/4 + 3*I**self.y/4 + I**(self.y + 1)/4 + 2}, False
 
         else:
             raise BaseException("Invalid pattern")

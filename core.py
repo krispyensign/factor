@@ -8,7 +8,7 @@ from sympy import (  # type: ignore
     Function,
     Mod,
     Expr,
-    pprint,
+    Integer,
 )
 
 # define some global symbols
@@ -24,64 +24,95 @@ e: list[Symbol] = symbols('e0, e1, e2, e3')
 class w1(Function):
     """Walsh[1] function"""
     @classmethod
-    def eval(cls, n: Expr) -> int | Function:
+    def eval(cls, n: Expr) -> int | Expr | None:
         if n.is_Symbol:
-            return
+            return None
 
-        elif n.is_Integer:
-            match Mod(n, 2):
-                case 0: return 1
-                case 1: return -1
+        if n.is_Integer:
+            m: Integer = Mod(n, 2)
+            if m == 0:
+                return 1
+            else:
+                return -1
+
+        if n.is_Add:
+            if n in [
+                2*x + w1(x)/2 + Rational(1/2), # Zi_expr_1
+            ]:
+                return -w1(x)
+            elif n in [
+                2*y + w1(y)/2 + Rational(1/2),
+            ]: # Zi_expr_1
+                return -w1(y)
+            elif n in [
+                x - w1(y)/2 + Rational(1/2), #Zi_expr_4
+                y - w1(x)/2 + Rational(1/2), #Zi_expr_4
+                x + y,
+            ]: # Zi_add_l
+                return w1(x)*w1(y)
+            elif n in [2*x + 1, 2*y + 1]:
+                return -1
+            elif n in [2*x + 2, 2*y + 2]:
+                return 1
+            elif n in [
+                x - w1(y) + Rational(1), # Zi_expr_2
+                2*x - w1(x)/2 + Rational(1/2), # Zi_expr_3
+                2*x + w1(x)/2 - Rational(1/2), # Zi_expr_5
+                2*x + w1(x)/2 + Rational(3/2),
+            ]: 
+                return w1(x)
+            elif n in [
+                y - w1(x) + Rational(1), #Zi_expr_2
+                2*y - w1(y)/2 + Rational(1/2), # Zi_expr_3
+                2*y + w1(y)/2 - Rational(1/2), # Zi_expr_5
+                2*y + w1(y)/2 + Rational(3/2),
+            ]:
+                return w1(y)
+            elif n in [
+                x + w1(y)/2 + Rational(1/2), #Zi_expr_4
+                y + w1(x)/2 + Rational(1/2), #Zi_expr_4
+                x + y + 1, #zi_add_l
+            ]:
+                return -w1(x)*w1(y)
         
-        elif n == 2*x + w1(x)/2 + Rational(1/2): # Zi_expr_1
-            return -w1(x)
-        elif n == 2*y + w1(y)/2 + Rational(1/2): # Zi_expr_1
-            return -w1(y)
-        elif n == x + y: # Zi_add_l
-            return w1(x)*w1(y)
-        
-        elif n in [2*x, 4*x, 6*x, 2*y, 4*y, 6*y]:
-            return 1
-        elif n in [2*x + 1, 2*y + 1]:
-            return -1
-        elif n in [2*x + 2, 2*y + 2]:
-            return 1
-        elif n in [x - w1(y) + Rational(1), #Zi_expr_2
-                   2*x - w1(x)/2 + Rational(1/2), # Zi_expr_3
-                   2*x + w1(x)/2 - Rational(1/2)]: # Zi_expr_5
-            return w1(x)
-        elif n in [y - w1(x) + Rational(1), #Zi_expr_2
-                   2*y - w1(y)/2 + Rational(1/2), # Zi_expr_3
-                   2*y + w1(y)/2 - Rational(1/2)]: # Zi_expr_5
-            return w1(y)
-        elif n in [x + w1(y)/2 + Rational(1/2), #Zi_expr_4
-                   y + w1(x)/2 + Rational(1/2), #Zi_expr_4
-                   x + y + 1]: #zi_add_l
-            return -w1(x)*w1(y)
+        elif n.is_Mul:
+            if n in [2*x, 4*x, 6*x, 2*y, 4*y, 6*y]:
+                return 1
+        return None
 
 
 class w2(Function):
     """Walsh[2] function"""
     @classmethod
-    def eval(cls, n: int | Expr) -> int | Function:
+    def eval(cls, n: Expr) -> int | Expr | None:
         if n.is_Integer:
-            match Mod(n, 4):
-                case 0: return 1
-                case 1: return 1
-                case 2: return -1
-                case 3: return -1
+            m: Integer = Mod(n, 4)
+            if m == 0:
+                return 1
+            elif m == 1:
+                return 1
+            elif m == 2:
+                return -1
+            elif m == 3:
+                return -1
+        return None
 
 
 class w3(Function):
     """Walsh[3] function"""
     @classmethod
-    def eval(cls, n: int | Expr) -> int | Function:
+    def eval(cls, n: Expr) -> int | Expr | None:
         if n.is_Integer:
-            match Mod(n, 4):
-                case 0: return 1
-                case 1: return -1
-                case 2: return -1
-                case 3: return 1
+            m: Integer = Mod(n, 4)
+            if m == 0:
+                return 1
+            elif m == 1:
+                return -1
+            elif m == 2:
+                return -1
+            elif m == 3:
+                return 1
+        return None
 
 
 def condense_terms_d(f: Add) -> Add:

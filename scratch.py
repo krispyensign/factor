@@ -10,25 +10,36 @@ from sympy import (   # type: ignore
     pprint,
     Mul,
     Rational,
+    sqrt,
 )
 from core import hadamard_transform, w1
 
 from functor import Functor
 from utils import matrix_print, sep_print
 
+def trans(f):
+    af = f.coeff(x**2)
+    bf = f.coeff(x)
+    cf = f.coeff(x, n=0)
+    df = bf**2 - 4*af*cf
+    return (-x**2 + df).expand()
+
 if __name__ == "__main__":
-    x, y = symbols("x,y")
-    fn =  Functor(3*x**2/4 + 4*x*y - x*w1(x) - 3*x*w1(y)/4 + 27*x/4 + 4*y**2 
-        - 2*y*w1(x) - 3*y*w1(y)/2 + 14*y + 3*w1(x)*w1(y)/8 - 7*w1(x)/2 - 21*w1(y)/8 - Rational(83207989/4))
-    # [0 1 2 3] + [0 1 0 1] => 0 2 2 
-    fn = Functor(
-        fn.f
-        .subs({x: x + 1})
-        .subs({y: y + (1 - w1(x)) / 2})
-        .subs({x: x + 1})
-        .xreplace({w1(x + 2): w1(x), w1(x + 1): -w1(x)})
-    )
-    pprint(fn.f)
-    # 
-    m = fn.gen_matrix(2,4)
-    matrix_print(m)
+    x, y, t = symbols("x,y,t")
+    # 3*x**2 + 8*x*y + 8*x + 5*y - 20802006     x=-6819    y=2175
+
+    f = 3*x**2 + 8*x*y + 8*x + 5*y - 20802006
+    # pprint(trans(f))
+
+    pprint(trans(3*x**2/2 + 8*x*y + 7*x/2 + y - Rational(20802009/2)))
+    pprint(trans(3*x**2/2 + 8*x*y + 7*x + 3*y - Rational(20802005/2)))
+    pprint(trans(3*x**2/2 + 8*x*y + 15*x/2 + y - 10401004))
+    pprint(trans(3*x**2/2 + 8*x*y + 11*x + 3*y - 10401001 ))
+
+
+    sep_print()
+
+    pprint(trans(3*x**2/4 + 8*x*y + 15*x/4 + y - 5200502))
+    pprint(trans(3*x**2/4 + 8*x*y + 11*x/2 + 3*y - Rational(10401001/2)))
+    pprint(trans(3*x**2/4 + 8*x*y + 31*x/4 + y - Rational(10401003/2)))
+    pprint(trans(3*x**2/4 + 8*x*y + 19*x/2 + 3*y - 5200499))

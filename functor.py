@@ -1,5 +1,4 @@
 from sympy import (  # type: ignore
-    SYMPY_DEBUG,
     Mod,
     symbols,
     pprint,
@@ -82,8 +81,14 @@ class Functor:
 
     def lift(self, flip_rotation: bool) -> Tuple[Expr, bool, bool, dict[Symbol, Expr]]:
         # perform pattern match to get the subexpression and various flags
-        do_division, sub_expression, is_rotated = self.matcher(
+        match = self.matcher(
             self.gen_matrix(), flip_rotation)
+
+        # perform transform if no matches to try to unstuck the algo
+        if match is None:
+            raise BaseException("No matches")
+
+        do_division, sub_expression, is_rotated = match
 
         # pretty print the sub expression
         pprint(sub_expression)
@@ -123,17 +128,23 @@ class Functor:
         self,
         m: list[list[Integer]],
         flip_rotation: bool,
-    ) -> Tuple[bool, dict[Symbol, Expr], bool]:
+    ) -> Tuple[bool, dict[Symbol, Expr], bool] | None:
         # setup rotation
         rotator = {self.x: self.x + self.y}
         if flip_rotation is True:
             rotator = {self.y: self.x + self.y}
 
         # region match simple subexpressions
-        if m == [[1, 0, 1, 0],
-                 [1, 0, 1, 0],
-                 [1, 0, 1, 0],
-                 [1, 0, 1, 0]]:
+        if m == [[0, 0, 0, 0],
+                 [0, 0, 0, 0],
+                 [0, 0, 0, 0],
+                 [0, 0, 0, 0],]:
+            return True, {self.x: self.x}, False
+    
+        elif m == [[1, 0, 1, 0],
+                   [1, 0, 1, 0],
+                   [1, 0, 1, 0],
+                   [1, 0, 1, 0]]:
             return True, {self.x: 2*self.x + 1}, False
 
         elif m == [[0, 1, 0, 1],
@@ -211,7 +222,7 @@ class Functor:
             return True, {self.y: 2*self.y + (1 - w1(self.y)) / 2}, False
         # endregion
 
-        # region match rotations
+        # region match rotations 
         elif m in [[[0, 1, 1, 0],
                     [0, 1, 1, 0],
                     [1, 0, 0, 1],
@@ -294,14 +305,17 @@ class Functor:
                     [1, 0, 0, 1],
                     [1, 1, 0, 0],
                     [1, 0, 0, 1]],
+                   
+                   [[1, 0, 0, 1],
+                    [0, 0, 1, 1],
+                    [1, 0, 0, 1],
+                    [0, 0, 1, 1]],
 
                    [[0, 0, 1, 1],
                     [0, 1, 1, 0],
                     [0, 0, 1, 1],
                     [0, 1, 1, 0]]]:
             return False, {self.x: self.x + (1 + w1(self.y)) / 2}, False
-            # [1 2 3 4]
-            # [0 1 2 3]
 
         elif m in [[[1, 1, 0, 0],
                     [0, 0, 1, 1],
@@ -414,5 +428,4 @@ class Functor:
             return False, {self.y: self.y + 1 - w1(self.x)}, False
         # endregion
 
-        else:
-            raise BaseException("Invalid pattern")
+        return None

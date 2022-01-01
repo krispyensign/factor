@@ -106,7 +106,7 @@ class Functor:
         w1x : Symbol = symbols('w1x')
         w1y : Symbol = symbols('w1y')
         # replace complicated exponents with simpler isomorphic exponents over the integers
-        return self.f.expand().xreplace({
+        return self.f.expand().subs({
             w1(self.x)**2: 1,
             w2(self.x)**2: 1,
             w3(self.x)**2: 1,
@@ -223,7 +223,17 @@ class Functor:
         # endregion
 
         # region match rotations 
-        elif m in [[[0, 1, 1, 0],
+        elif m in [[[1, 0, 1, 0],
+                    [0, 1, 0, 1],
+                    [1, 0, 1, 0],
+                    [0, 1, 0, 1]],
+
+                   [[0, 1, 0, 1],
+                    [1, 0, 1, 0],
+                    [0, 1, 0, 1],
+                    [1, 0, 1, 0]],
+
+                   [[0, 1, 1, 0],
                     [0, 1, 1, 0],
                     [1, 0, 0, 1],
                     [1, 0, 0, 1]],
@@ -380,17 +390,7 @@ class Functor:
                     [0, 0, 0, 0]]]:
             return False, {self.y: self.y + (1 - w1(self.x)) / 2}, False
 
-        elif m in [[[1, 0, 1, 0],
-                    [0, 1, 0, 1],
-                    [1, 0, 1, 0],
-                    [0, 1, 0, 1]],
-
-                   [[0, 1, 0, 1],
-                    [1, 0, 1, 0],
-                    [0, 1, 0, 1],
-                    [1, 0, 1, 0]],
-
-                   [[0, 1, 1, 0],
+        elif m in [[[0, 1, 1, 0],
                     [0, 0, 1, 1],
                     [0, 1, 1, 0],
                     [0, 0, 1, 1]],
